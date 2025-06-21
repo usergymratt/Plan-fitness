@@ -3,286 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Entrenamiento de Daniel Ramírez</title>
+    <title>Plan Pro Daniel Ramírez - Red & Black Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'brand-bg': '#0A0A0A',
-                        'brand-surface': '#191919',
-                        'brand-primary': '#DC2626', // Red-600
-                        'brand-primary-darker': '#991B1B', // Red-800
-                        'brand-text': '#F5F5F5',
-                        'brand-text-muted': '#A3A3A3',
-                    },
-                    boxShadow: {
-                        'glow': '0 0 15px rgba(220, 38, 38, 0.4), 0 0 5px rgba(220, 38, 38, 0.3)',
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- Chosen Palette: Red & Black (Near-black BG, Dark Gray Surface, Intense Red Accent) -->
-    <!-- Application Structure Plan: Retained the "Hyper Dark" SPA structure with a dashboard, tools, progress, routine, and fundamentals sections. This structure is robust and well-organized. -->
-    <!-- Visualization & Content Choices: Color palette is red/black. All interactive elements (buttons, active states), borders, chart colors, and glow effects use the red theme for a consistent aesthetic. The critical bug in the routine navigation has been fixed to ensure full functionality. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Minimalist Red & Black -->
+    <!-- Application Structure Plan: La app ha sido rediseñada con una estética rojo/negro. La sección "Progreso" ha sido expandida significativamente para incluir un registro de levantamientos con filtro por ejercicio, permitiendo un seguimiento de la sobrecarga progresiva. Se ha añadido una nueva tarjeta de "Calculadoras de Entrenamiento" en "Recursos" con herramientas para estimar el 1RM y calcular el peso de trabajo basado en el RIR, respondiendo a la petición de herramientas fundamentales para el entrenamiento avanzado. -->
+    <!-- Visualization & Content Choices: 1. Registro de Levantamientos: (Meta: Analizar) Un formulario y una tabla dinámica con un filtro desplegable (HTML/JS) para un seguimiento detallado. Justificación: Funcionalidad esencial para atletas serios que basan su progreso en la sobrecarga progresiva. 2. Calculadoras de Entrenamiento: (Meta: Informar/Planificar) Formularios simples (HTML/JS) que aplican fórmulas estándar (Epley para 1RM) para dar feedback inmediato al usuario. Justificación: Empodera al usuario con herramientas para autorregular su entrenamiento de forma científica. 3. Estilo Visual: El tema rojo/negro se aplica globalmente, incluyendo el gráfico de Chart.js y los estados 'focus' de los formularios, para una experiencia visual cohesiva y minimalista. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0A0A0A;
-            color: #F5F5F5;
-        }
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
-        .page { display: none; }
-        .page.active { display: block; animation: fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .nav-link.active {
-            color: #DC2626;
-            border-bottom-color: #DC2626;
-            text-shadow: 0 0 8px rgba(220, 38, 38, 0.7);
-        }
-        .day-btn.active {
-            background-color: #DC2626;
-            color: #F5F5F5;
-            font-weight: bold;
-            box-shadow: 0 0 15px rgba(220, 38, 38, 0.5);
-        }
-        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out; }
-        .chart-container { position: relative; width: 100%; height: 300px; max-height: 350px; }
-
-        .card-border-gradient {
-            border: 1px solid transparent;
-            background: linear-gradient(#191919, #191919) padding-box, linear-gradient(120deg, #991B1B, #EF4444) border-box;
-        }
-        .tool-card {
-            background: radial-gradient(circle at top left, rgba(220, 38, 38, 0.1), transparent 40%), 
-                        radial-gradient(circle at bottom right, rgba(153, 27, 27, 0.1), transparent 40%),
-                        #191919;
-        }
+        :root { --main-red: #dc2626; --dark-bg: #101010; --card-bg: #181818; --text-light: #e5e5e5; --text-dark: #a3a3a3; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--dark-bg); color: var(--text-light); }
+        .nav-link.active { background-color: var(--main-red); color: white; }
+        .nav-link:not(.active) { color: var(--text-dark); hover:bg-gray-800; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        .chart-container { position: relative; margin: auto; height: 280px; width: 280px; }
+        @media (min-width: 640px) { .chart-container { height: 320px; width: 320px; } }
+        .workout-day-btn.active { background-color: var(--main-red); color: white; }
+        .workout-day-btn:not(.active) { background-color: #262626; color: var(--text-dark); hover:bg-gray-700; border-color: #404040; }
+        .card { background-color: var(--card-bg); border: 1px solid #262626; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1); padding: 1.5rem; transition: all 0.3s; }
+        .card:hover { border-color: var(--main-red); }
+        .nav-link-mobile.active { border-top: 2px solid var(--main-red); color: var(--main-red); }
+        .nav-link-mobile.active > span { color: var(--main-red); font-weight: 600; }
+        .form-input { background-color: #262626; border: 1px solid #404040; border-radius: 0.375rem; padding: 0.5rem 0.75rem; color: var(--text-light); placeholder-color: var(--text-dark); }
+        .form-input:focus { outline: none; ring: 2px; ring-color: var(--main-red); border-color: var(--main-red); }
+        .btn-primary { background-color: var(--main-red); color: white; font-weight: bold; padding: 0.5rem 1rem; border-radius: 0.375rem; transition: background-color 0.2s; }
+        .btn-primary:hover { background-color: #b91c1c; }
+        .btn-danger { background-color: #991b1b; color: white; padding: 0.25rem 0.5rem; font-size: 0.75rem; border-radius: 0.25rem; }
+        .btn-danger:hover { background-color: #7f1d1d; }
     </style>
 </head>
-<body class="bg-brand-bg">
-
-    <div class="max-w-7xl mx-auto min-h-screen bg-brand-bg">
-        <header class="bg-brand-surface/70 backdrop-blur-lg p-4 sm:p-6 border-b border-gray-800 sticky top-0 z-20">
-             <div class="flex flex-col sm:flex-row justify-between items-center">
-                <h1 class="text-2xl sm:text-3xl font-black text-white tracking-wider">Página de <span class="text-brand-primary">Daniel Ramírez</span></h1>
-                <nav id="main-nav" class="flex flex-wrap justify-center gap-x-1 sm:gap-x-3 mt-4 sm:mt-0">
-                    <a href="#" data-target="dashboard" class="nav-link active text-xs sm:text-sm font-medium border-b-2 border-transparent p-2 transition">PANEL</a>
-                    <a href="#" data-target="tools" class="nav-link text-xs sm:text-sm font-medium border-b-2 border-transparent p-2 transition">HERRAMIENTAS</a>
-                    <a href="#" data-target="progress" class="nav-link text-xs sm:text-sm font-medium border-b-2 border-transparent p-2 transition">PROGRESO</a>
-                    <a href="#" data-target="routine" class="nav-link text-xs sm:text-sm font-medium border-b-2 border-transparent p-2 transition">RUTINA</a>
-                    <a href="#" data-target="accessories" class="nav-link text-xs sm:text-sm font-medium border-b-2 border-transparent p-2 transition">ACCESORIOS</a>
-                    <a href="#" data-target="nutrition" class="nav-link text-xs sm:text-sm font-medium border-b-2 border-transparent p-2 transition">NUTRICIÓN</a>
-                    <a href="#" data-target="fundamentals" class="nav-link text-xs sm:text-sm font-medium border-b-2 border-transparent p-2 transition">FUNDAMENTOS</a>
-                </nav>
-            </div>
+<body class="antialiased">
+    <div class="min-h-screen">
+        <header class="bg-black/50 backdrop-blur-md shadow-lg sticky top-0 z-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"><div class="flex items-center justify-between h-16">
+                <div class="flex items-center"><span class="text-2xl font-bold" style="color: var(--main-red);">🔥</span><h1 class="ml-3 text-xl font-bold tracking-tight">Plan Pro Daniel Ramírez</h1></div>
+                <nav class="hidden md:flex space-x-2" id="main-nav"><a data-tab="resumen" class="nav-link active">Resumen</a><a data-tab="nutricion" class="nav-link">Nutrición</a><a data-tab="entrenamiento" class="nav-link">Entrenamiento</a><a data-tab="progreso" class="nav-link">Progreso</a><a data-tab="recursos" class="nav-link">Recursos</a></nav>
+            </div></div>
         </header>
 
-        <main id="content-area" class="p-4 sm:p-6 lg:p-8">
-            <section id="dashboard" class="page active">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div class="lg:col-span-2 bg-brand-surface p-6 rounded-lg shadow-lg card-border-gradient">
-                        <h3 class="text-2xl font-bold mb-4 text-white">Volumen Semanal <span class="text-brand-text-muted text-lg font-medium">(Series Efectivas)</span></h3>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                            <div class="bg-gray-900/50 p-4 rounded-lg text-center"><h4 class="font-semibold text-brand-primary">Pecho</h4><p class="text-4xl font-black">17</p></div>
-                            <div class="bg-gray-900/50 p-4 rounded-lg text-center"><h4 class="font-semibold text-brand-primary">Espalda</h4><p class="text-4xl font-black">20</p></div>
-                            <div class="bg-gray-900/50 p-4 rounded-lg text-center"><h4 class="font-semibold text-brand-primary">Hombros</h4><p class="text-4xl font-black">24</p></div>
-                            <div class="bg-gray-900/50 p-4 rounded-lg text-center"><h4 class="font-semibold text-brand-primary">Piernas</h4><p class="text-4xl font-black">21</p></div>
-                            <div class="bg-gray-900/50 p-4 rounded-lg text-center"><h4 class="font-semibold text-brand-primary">Bíceps</h4><p class="text-4xl font-black">9</p></div>
-                            <div class="bg-gray-900/50 p-4 rounded-lg text-center"><h4 class="font-semibold text-brand-primary">Tríceps</h4><p class="text-4xl font-black">13</p></div>
+        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8"><div class="px-4 py-6 sm:px-0">
+            <section id="resumen" class="content-section active">
+                <div class="text-center mb-10"><h2 class="text-3xl font-bold tracking-tight sm:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-white to-red-400">Tu Panel de Control</h2><p class="mt-4 text-lg text-gray-400">Objetivos nutricionales para máxima definición.</p></div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div class="flex flex-col items-center"><div class="chart-container"><canvas id="macroChart"></canvas></div></div>
+                    <div class="space-y-6">
+                        <div class="card text-center"><h3 class="text-lg font-semibold text-gray-500">Calorías Totales</h3><p id="total-calorias" class="text-5xl font-bold text-white">2270</p><p class="text-sm text-gray-400">kcal/día</p></div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="card text-center"><h4 class="text-md font-semibold text-red-500">Proteínas</h4><p id="gramos-proteina" class="text-3xl font-bold">225g</p></div>
+                            <div class="card text-center"><h4 class="text-md font-semibold text-gray-300">Carbs</h4><p id="gramos-carbs" class="text-3xl font-bold">200g</p></div>
+                            <div class="card text-center"><h4 class="text-md font-semibold text-gray-500">Grasas</h4><p id="gramos-grasas" class="text-3xl font-bold">63g</p></div>
                         </div>
                     </div>
-                    <div class="bg-brand-surface p-6 rounded-lg shadow-lg card-border-gradient">
-                        <h3 class="text-2xl font-bold mb-4 text-white">Macros Diarios</h3>
-                         <div class="chart-container">
-                            <canvas id="macroChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            
-            <section id="tools" class="page">
-                <div class="text-center mb-8">
-                    <h2 class="text-3xl font-bold text-brand-primary mb-2">Herramientas de Entrenamiento</h2>
-                    <p class="text-brand-text-muted max-w-3xl mx-auto">Calculadoras para optimizar tu tiempo y esfuerzo en el gimnasio.</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="p-6 rounded-lg shadow-lg tool-card border border-gray-800">
-                         <h3 class="text-xl font-bold mb-4 text-white">Calculadora de 1RM (Repetición Máxima)</h3>
-                         <div class="space-y-4">
-                            <div>
-                                <label for="rmWeight" class="block text-sm font-medium text-brand-text-muted">Peso Levantado (kg)</label>
-                                <input type="number" id="rmWeight" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-brand-primary focus:border-brand-primary" placeholder="80">
-                            </div>
-                            <div>
-                                <label for="rmReps" class="block text-sm font-medium text-brand-text-muted">Repeticiones Completadas</label>
-                                <input type="number" id="rmReps" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-brand-primary focus:border-brand-primary" placeholder="5">
-                            </div>
-                            <button id="calculateRM" class="w-full bg-brand-primary text-white font-bold py-2 px-4 rounded-lg shadow-glow hover:bg-brand-primary-darker transition-all">Calcular 1RM Estimado</button>
-                            <div id="rmResult" class="text-center bg-gray-900 p-4 rounded-lg hidden"><p class="text-brand-text-muted">Tu 1RM estimado es:</p><p class="text-4xl font-black text-brand-primary">93.3 kg</p></div>
-                         </div>
-                    </div>
-                    <div class="p-6 rounded-lg shadow-lg tool-card border border-gray-800">
-                        <h3 class="text-xl font-bold mb-4 text-white">Calculadora de Placas (Barra Olímpica 20kg)</h3>
-                         <div class="space-y-4">
-                            <div>
-                                <label for="plateWeight" class="block text-sm font-medium text-brand-text-muted">Peso Total en la Barra (kg)</label>
-                                <input type="number" id="plateWeight" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-brand-primary focus:border-brand-primary" placeholder="100">
-                            </div>
-                            <button id="calculatePlates" class="w-full bg-brand-primary text-white font-bold py-2 px-4 rounded-lg shadow-glow hover:bg-brand-primary-darker transition-all">Calcular Placas</button>
-                            <div id="plateResult" class="text-center bg-gray-900 p-4 rounded-lg hidden">
-                                <p class="text-brand-text-muted mb-2">Poner en cada lado:</p>
-                                <div id="plateResultContent" class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm"></div>
-                            </div>
-                         </div>
-                    </div>
-                </div>
-            </section>
+                </section>
 
-            <section id="progress" class="page">
-                <div class="text-center mb-8"><h2 class="text-3xl font-bold text-brand-primary mb-2">Registro de Progreso</h2><p class="text-brand-text-muted max-w-3xl mx-auto">Anota tus avances para mantener la motivación y ajustar el plan.</p></div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8"><div class="bg-brand-surface p-6 rounded-lg shadow-lg"><h3 class="text-xl font-semibold mb-4 text-white">Peso y Medidas</h3><div class="space-y-4"><div><label for="weight" class="block text-sm font-medium text-brand-text-muted">Peso Actual (kg)</label><input type="text" id="weight" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-brand-primary" placeholder="89.5"></div><div><label for="chest" class="block text-sm font-medium text-brand-text-muted">Pecho (cm)</label><input type="text" id="chest" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-brand-primary" placeholder="110"></div><div><label for="waist" class="block text-sm font-medium text-brand-text-muted">Cintura (cm)</label><input type="text" id="waist" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-brand-primary" placeholder="84"></div><div><label for="bicep" class="block text-sm font-medium text-brand-text-muted">Bíceps (cm)</label><input type="text" id="bicep" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-brand-primary" placeholder="40.5"></div></div></div><div class="bg-brand-surface p-6 rounded-lg shadow-lg"><h3 class="text-xl font-semibold mb-4 text-white">Notas Adicionales</h3><textarea class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md h-64 text-brand-text focus:outline-none focus:ring-brand-primary" placeholder="Anota aquí cualquier observación: cómo te sentiste, un récord personal, etc."></textarea></div></div>
+            <section id="nutricion" class="content-section">
+                 <div class="text-center mb-10"><h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Arquitectura Nutricional</h2><p class="mt-4 text-lg text-gray-400">Usa la matriz para personalizar tus comidas.</p></div>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                    <div class="card"><h3 class="text-xl font-bold mb-4">Plan de Alimentación</h3><ul class="space-y-3 text-gray-300"><li><strong style="color: var(--main-red);">Comida 1:</strong> 5 claras + 1 huevo, 1/2 aguacate.</li><li><strong style="color: var(--main-red);">Comida 2:</strong> 200g yogur griego, frutos rojos.</li><li><strong style="color: var(--main-red);">Comida 3 (Pre):</strong> 200g pollo, 200g arroz, brócoli.</li><li><strong style="color: var(--main-red);">Comida 4 (Post):</strong> 40g whey. Luego: 180g lomo, 250g papa.</li><li><strong style="color: var(--main-red);">Comida 5:</strong> 200g cottage o 180g salmón, almendras.</li></ul></div>
+                    <div class="card"><h3 class="text-xl font-bold mb-4">Estrategia y Flexibilidad</h3><div class="space-y-4 text-gray-300"><p><strong style="color: var(--main-red);">Frecuencia:</strong> 4-6 comidas para optimizar MPS.</p><p><strong style="color: var(--main-red);">Timing de Carbs:</strong> Concentra carbs pre/post entreno.</p><p><strong style="color: var(--main-red);">Consistencia:</strong> Es la clave, mantén calorías y proteína estables.</p><p><strong style="color: var(--main-red);">Hidratación:</strong> Mínimo 3-4 litros de agua/día.</p></div></div>
+                </div>
+                <div class="card"><h3 class="text-xl font-bold mb-4 text-center">Matriz de Selección de Alimentos</h3><div class="overflow-x-auto"><table class="w-full text-sm text-left text-gray-400"><thead class="text-xs text-gray-300 uppercase bg-black/30"><tr><th class="px-6 py-3">Proteína</th><th class="px-6 py-3">Carbs</th><th class="px-6 py-3">Grasas</th><th class="px-6 py-3">Verduras/Frutas</th></tr></thead><tbody class="divide-y divide-gray-800"><tr><td class="px-6 py-4">Pechuga de pollo/pavo</td><td class="px-6 py-4">Avena, arroz</td><td class="px-6 py-4">Aguacate</td><td class="px-6 py-4">Brócoli, espinaca</td></tr><tr><td class="px-6 py-4">Lomo de res/cerdo</td><td class="px-6 py-4">Papa, batata, yuca</td><td class="px-6 py-4">Aceite de oliva</td><td class="px-6 py-4">Coliflor, pimentón</td></tr><tr><td class="px-6 py-4">Pescado blanco</td><td class="px-6 py-4">Plátano, pasta</td><td class="px-6 py-4">Nueces, almendras</td><td class="px-6 py-4">Cebolla, tomate</td></tr></tbody></table></div></div>
             </section>
+            
+            <section id="entrenamiento" class="content-section">
+                <div class="text-center mb-10"><h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Protocolo de Entrenamiento</h2><p class="mt-4 text-lg text-gray-400">Enfoque en técnica, RIR y sobrecarga progresiva.</p></div>
+                <div class="flex justify-center flex-wrap gap-2 mb-8" id="workout-nav"><button data-day="1" class="workout-day-btn active">Día 1</button><button data-day="2" class="workout-day-btn">Día 2</button><button data-day="3" class="workout-day-btn">Día 3</button><button data-day="4" class="workout-day-btn">Día 4</button><button data-day="5" class="workout-day-btn">Día 5</button></div>
+                <div id="workout-content" class="card"></div>
+            </section>
+            
+            <section id="progreso" class="content-section">
+                <div class="text-center mb-10"><h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Tu Centro de Progreso</h2><p class="mt-4 text-lg text-gray-400">Registra tus métricas, notas y levantamientos. La data es poder.</p></div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="card space-y-4"><h3 class="text-xl font-bold text-center text-red-500">Registro de Medidas</h3>
+                        <form id="measurement-form" class="grid grid-cols-2 gap-4"><input type="date" id="measure-date" class="form-input col-span-2"><input type="number" step="0.1" id="measure-weight" placeholder="Peso (kg)" class="form-input"><input type="number" step="0.1" id="measure-waist" placeholder="Cintura (cm)" class="form-input"><input type="number" step="0.1" id="measure-chest" placeholder="Pecho (cm)" class="form-input"><input type="number" step="0.1" id="measure-arm" placeholder="Brazo (cm)" class="form-input"><button type="submit" class="btn-primary col-span-2">Guardar Medidas</button></form>
+                        <div class="overflow-auto max-h-60"><table class="w-full text-sm text-left"><thead class="text-xs text-red-400 uppercase bg-black/30"><tr><th class="p-2">Fecha</th><th class="p-2">Peso</th><th class="p-2">Cintura</th><th class="p-2"></th></tr></thead><tbody id="measurements-history" class="divide-y divide-gray-800"></tbody></table></div>
+                    </div>
+                    <div class="card space-y-4"><h3 class="text-xl font-bold text-center text-red-500">Bitácora de Notas</h3>
+                        <form id="notes-form" class="space-y-4"><textarea id="note-text" rows="4" class="form-input" placeholder="Anota tus victorias, sensaciones, ajustes..."></textarea><button type="submit" class="btn-primary">Guardar Nota</button></form>
+                        <div id="notes-history" class="space-y-3 overflow-auto max-h-60 pr-2"></div>
+                    </div>
+                    <div class="card lg:col-span-2 space-y-4"><h3 class="text-xl font-bold text-center text-red-500">Registro de Levantamientos</h3>
+                        <form id="lift-form" class="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
+                            <div class="sm:col-span-2"><label for="lift-exercise" class="text-xs text-gray-400">Ejercicio</label><select id="lift-exercise" class="form-input w-full"></select></div>
+                            <div><label for="lift-weight" class="text-xs text-gray-400">Peso (kg)</label><input type="number" step="0.5" id="lift-weight" placeholder="kg" class="form-input"></div>
+                            <div><label for="lift-reps" class="text-xs text-gray-400">Reps</label><input type="number" id="lift-reps" placeholder="Reps" class="form-input"></div>
+                            <button type="submit" class="btn-primary sm:col-span-4">Guardar Levantamiento</button>
+                        </form>
+                        <div class="flex justify-between items-center"><h4 class="text-lg font-semibold">Historial</h4><select id="lift-filter" class="form-input w-1/2 sm:w-1/3"></select></div>
+                        <div class="overflow-auto max-h-72"><table class="w-full text-sm text-left"><thead class="text-xs text-red-400 uppercase bg-black/30"><tr><th class="p-2">Fecha</th><th class="p-2">Ejercicio</th><th class="p-2">Peso</th><th class="p-2">Reps</th><th class="p-2"></th></tr></thead><tbody id="lifts-history" class="divide-y divide-gray-800"></tbody></table></div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="recursos" class="content-section">
+                <div class="text-center mb-10"><h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Caja de Herramientas</h2><p class="mt-4 text-lg text-gray-400">Conocimiento clave para potenciar tus resultados.</p></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="card lg:col-span-3"><h3 class="text-2xl font-bold mb-4">Calculadoras de Entrenamiento</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div><h4 class="font-bold text-lg text-red-500 mb-2">Calculadora de 1RM Estimado</h4><form id="1rm-form" class="space-y-3"><input type="number" id="1rm-weight" placeholder="Peso levantado (kg)" class="form-input"><input type="number" id="1rm-reps" placeholder="Repeticiones completadas" class="form-input"><button type="submit" class="btn-primary w-full">Calcular 1RM</button></form><p id="1rm-result" class="mt-3 font-bold text-center text-xl"></p></div>
+                        <div><h4 class="font-bold text-lg text-red-500 mb-2">Calculadora de Peso por RIR</h4><form id="rir-form" class="space-y-3"><input type="number" id="rir-1rm" placeholder="Tu 1RM estimado (kg)" class="form-input"><input type="number" id="rir-reps" placeholder="Repeticiones objetivo" class="form-input"><input type="number" id="rir-rir" placeholder="RIR deseado (0-3)" class="form-input"><button type="submit" class="btn-primary w-full">Calcular Peso</button></form><p id="rir-result" class="mt-3 font-bold text-center text-xl"></p></div>
+                    </div></div>
+                    <div class="card"><h3 class="text-2xl font-bold mb-4">Fundamentales</h3><ul class="text-sm list-disc list-inside text-gray-300 space-y-2"><li><strong>Abdomen:</strong> Sobrecarga progresiva con ejercicios como Crunch en Polea y Elev. de Piernas Colgado.</li><li><strong>Antebrazo:</strong> Atacar con flexión/extensión de muñeca y trabajo de agarre (Paseo del Granjero).</li></ul></div>
+                    <div class="card"><h3 class="text-2xl font-bold mb-4">Ciencia</h3><ul class="text-sm list-disc list-inside text-gray-300 space-y-2"><li><strong>Déficit Calórico:</strong> Esencial para la oxidación de grasa.</li><li><strong>Proteína Elevada:</strong> Clave para la retención de masa muscular.</li><li><strong>Sobrecarga Progresiva:</strong> El pilar del progreso a largo plazo.</li></ul></div>
+                    <div class="card"><h3 class="text-2xl font-bold mb-4">Mindset</h3><ul class="text-sm list-disc list-inside text-gray-300 space-y-2"><li><strong>Consistencia > Perfección.</strong></li><li><strong>Paciencia y objetividad.</strong></li><li><strong>Conexión Mente-Músculo.</strong></li></ul></div>
+                </div>
+            </section>
+        </div></main>
 
-            <section id="routine" class="page">
-                 <div class="text-center mb-8"><h2 class="text-3xl font-bold text-brand-primary mb-2">Rutina de Entrenamiento Semanal</h2><p class="text-brand-text-muted max-w-3xl mx-auto">El plan de batalla. Selecciona un día para ver los detalles.</p></div>
-                <div id="routine-nav" class="flex flex-wrap justify-center gap-2 mb-6"><button data-day="day1" class="day-btn active px-4 py-2 text-sm font-medium rounded-md bg-brand-surface hover:bg-brand-primary-darker transition-colors">Día 1</button><button data-day="day2" class="day-btn px-4 py-2 text-sm font-medium rounded-md bg-brand-surface hover:bg-brand-primary-darker transition-colors">Día 2</button><button data-day="day3" class="day-btn px-4 py-2 text-sm font-medium rounded-md bg-brand-surface hover:bg-brand-primary-darker transition-colors">Día 3</button><button data-day="day4" class="day-btn px-4 py-2 text-sm font-medium rounded-md bg-brand-surface hover:bg-brand-primary-darker transition-colors">Día 4</button><button data-day="day5" class="day-btn px-4 py-2 text-sm font-medium rounded-md bg-brand-surface hover:bg-brand-primary-darker transition-colors">Día 5</button></div>
-                <div id="workouts-container"><div id="day1" class="workout-day active"></div><div id="day2" class="workout-day"></div><div id="day3" class="workout-day"></div><div id="day4" class="workout-day"></div><div id="day5" class="workout-day"></div></div>
-            </section>
-            
-            <section id="accessories" class="page">
-                 <div class="text-center mb-8"><h2 class="text-3xl font-bold text-brand-primary mb-2">Ejercicios Accesorios</h2><p class="text-brand-text-muted max-w-3xl mx-auto">Rutina de enfoque para abdomen y antebrazo. Intégralos en tus días de entrenamiento.</p></div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8"><div class="bg-brand-surface p-6 rounded-lg shadow-lg"><h3 class="text-2xl font-semibold mb-4 text-white">Abdomen / Core</h3><p class="text-brand-text-muted mb-4">Realizar 2-3 de estos, 3 veces por semana.</p><div class="space-y-4"><div class="bg-gray-900/50 p-3 rounded-lg"><p class="font-semibold text-brand-primary">Plancha Abdominal</p><p class="text-sm text-brand-text-muted">3 series al fallo. Descanso 60s.</p></div><div class="bg-gray-900/50 p-3 rounded-lg"><p class="font-semibold text-brand-primary">Elevaciones de Piernas Colgado</p><p class="text-sm text-brand-text-muted">3 series al fallo. Descanso 60s.</p></div><div class="bg-gray-900/50 p-3 rounded-lg"><p class="font-semibold text-brand-primary">Ab Wheel (Rueda Abdominal)</p><p class="text-sm text-brand-text-muted">3 series al fallo. Descanso 60-90s.</p></div><div class="bg-gray-900/50 p-3 rounded-lg"><p class="font-semibold text-brand-primary">Crunch en Polea Alta</p><p class="text-sm text-brand-text-muted">3 series de 12-20 reps. Descanso 60s.</p></div></div></div><div class="bg-brand-surface p-6 rounded-lg shadow-lg"><h3 class="text-2xl font-semibold mb-4 text-white">Antebrazo y Agarre</h3><p class="text-brand-text-muted mb-4">Realizar 2 de estos, 2 veces por semana.</p><div class="space-y-4"><div class="bg-gray-900/50 p-3 rounded-lg"><p class="font-semibold text-brand-primary">Curl Inverso con Barra</p><p class="text-sm text-brand-text-muted">3 series de 10-15 reps. Descanso 60s.</p></div><div class="bg-gray-900/50 p-3 rounded-lg"><p class="font-semibold text-brand-primary">Curl Martillo</p><p class="text-sm text-brand-text-muted">3 series de 10-15 reps. Descanso 60s.</p></div><div class="bg-gray-900/50 p-3 rounded-lg"><p class="font-semibold text-brand-primary">Paseo del Granjero</p><p class="text-sm text-brand-text-muted">3 series de 30-40 metros. Descanso 90s.</p></div><div class="bg-gray-900/50 p-3 rounded-lg"><p class="font-semibold text-brand-primary">Aguante de disco (Plate Pinch)</p><p class="text-sm text-brand-text-muted">3 series al fallo por mano. Descanso 60s.</p></div></div></div></div>
-            </section>
-            
-            <section id="nutrition" class="page">
-                <div class="text-center mb-8"><h2 class="text-3xl font-bold text-brand-primary mb-2">Plan Nutricional Detallado</h2><p class="text-brand-text-muted max-w-3xl mx-auto">Los números que construyen tu físico. Calculado para 20 años.</p></div>
-                <div class="bg-brand-surface p-6 rounded-lg shadow-lg"><h3 class="text-xl font-semibold mb-4 text-white">Cálculo de Necesidades Energéticas</h3><div class="overflow-x-auto"><table class="w-full text-left"><thead><tr class="border-b border-gray-700"><th class="p-3 font-semibold text-sm">Parámetro</th><th class="p-3 font-semibold text-sm">Cálculo (Edad: 20)</th><th class="p-3 font-semibold text-sm text-right">Resultado</th></tr></thead><tbody><tr class="border-b border-gray-700"><td>TMB</td><td class="text-sm text-brand-text-muted">Mifflin-St Jeor: 10*90 + 6.25*172 - 5*20 + 5</td><td class="font-bold text-right">1880 kcal</td></tr><tr class="border-b border-gray-700"><td>TDEE</td><td class="text-sm text-brand-text-muted">TMB * 1.55</td><td class="font-bold text-right">2914 kcal</td></tr><tr class="bg-brand-primary/10"><td><span class="font-bold text-brand-primary">Objetivo Calórico</span></td><td class="text-sm text-brand-primary/80">TDEE - 314 kcal</td><td class="font-bold text-brand-primary text-right text-lg">~2600 kcal</td></tr></tbody></table></div><h3 class="text-xl font-semibold mt-8 mb-4 text-white">Distribución de Macronutrientes</h3><ul class="space-y-4"><li><h4 class="font-semibold text-lg">Proteínas: <span class="text-brand-primary">180g</span></h4></li><li><h4 class="font-semibold text-lg">Grasas: <span class="text-brand-primary">72g</span></h4></li><li><h4 class="font-semibold text-lg">Carbohidratos: <span class="text-brand-primary">308g</span></h4></li></ul></div>
-            </section>
-            
-            <section id="fundamentals" class="page">
-                <div class="text-center mb-8"><h2 class="text-3xl font-bold text-brand-primary mb-2">Fundamentos Científicos</h2><p class="text-brand-text-muted max-w-3xl mx-auto">Conocimiento es poder. Entiende el porqué de tu plan.</p></div>
-                <div class="space-y-4"><div class="accordion-item bg-brand-surface rounded-lg"><button class="accordion-header w-full text-left p-4 font-semibold text-lg flex justify-between items-center text-white"><span>Principios Clave de Hipertrofia</span><span class="transform transition-transform duration-300">▼</span></button><div class="accordion-content"><div class="p-4 pt-0 text-brand-text-muted text-sm space-y-4"><p><strong class="text-white">Volumen, Intensidad y Frecuencia:</strong> Los 3 pilares. Este plan los manipula para maximizar el crecimiento.</p><p><strong class="text-white">Proximidad al Fallo (RIR):</strong> Es crucial. Entrenar cerca del fallo (1-3 reps antes) asegura que el estímulo sea suficiente. No es necesario fallar en cada serie.</p><div><h5 class="font-bold text-white mb-2">Guía de Repeticiones en Reserva (RIR)</h5><ul class="list-disc list-inside space-y-1"><li class="text-brand-primary"><span class="text-white font-bold">RIR 3:</span> Fácil, podrías hacer 3 reps más. Bueno para calentamiento.</li><li class="text-brand-primary"><span class="text-white font-bold">RIR 2:</span> Desafiante, te quedan 2 reps. El punto ideal para la mayoría de series.</li><li class="text-brand-primary"><span class="text-white font-bold">RIR 1:</span> Muy difícil, solo te queda 1 rep. Excelente para series pesadas.</li><li class="text-red-400"><span class="text-white font-bold">RIR 0:</span> Fallo muscular. Usar con moderación en ejercicios de aislamiento.</li></ul></div></div></div></div></div>
-            </section>
-        </main>
+        <div class="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-md shadow-[0_-2px_10px_rgba(0,0,0,0.5)] md:hidden h-16">
+            <nav class="flex justify-around items-center h-full" id="mobile-nav"><a data-tab="resumen" class="nav-link-mobile active flex flex-col items-center text-xs p-1 text-gray-400">📊<span class="mt-1">Resumen</span></a><a data-tab="nutricion" class="nav-link-mobile flex flex-col items-center text-xs p-1 text-gray-400">🍎<span class="mt-1">Nutrición</span></a><a data-tab="entrenamiento" class="nav-link-mobile flex flex-col items-center text-xs p-1 text-gray-400">🏋️<span class="mt-1">Entreno</span></a><a data-tab="progreso" class="nav-link-mobile flex flex-col items-center text-xs p-1 text-gray-400">📈<span class="mt-1">Progreso</span></a><a data-tab="recursos" class="nav-link-mobile flex flex-col items-center text-xs p-1 text-gray-400">🧠<span class="mt-1">Recursos</span></a></nav>
+        </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const workoutData = {
-                day1: { title: "Pecho, Hombro (Frontal/Lateral), Tríceps", exercises: [{ name: "Press Banca", sets: 4, reps: "5-8" }, { name: "Press Inclinado Mancuernas", sets: 3, reps: "8-12" }, { name: "Aperturas en Pec-Deck", sets: 3, reps: "12-15" }, { name: "Press Militar Sentado", sets: 4, reps: "6-10" }, { name: "Elevaciones Laterales", sets: 4, reps: "12-20" }, { name: "Fondos en Paralelas", sets: 3, reps: "6-10" }, { name: "Extensiones sobre Cabeza", sets: 3, reps: "10-15" }] },
-                day2: { title: "Espalda (Densidad), Hombro Post., Bíceps + LISS", exercises: [{ name: "Remo con Barra", sets: 4, reps: "5-8" }, { name: "Remo con Mancuerna", sets: 3, reps: "8-12" }, { name: "Remo en Máquina", sets: 3, reps: "12-15" }, { name: "Face Pulls", sets: 4, reps: "15-20" }, { name: "Curl Concentración", sets: 3, reps: "10-15" }, { name: "Curl Inclinado", sets: 3, reps: "8-12" }, { name: "Cardio LISS", sets: 1, reps: "30-40 min" }] },
-                day3: { title: "Piernas y Glúteos", exercises: [{ name: "Prensa de Piernas", sets: 4, reps: "8-12" }, { name: "Sentadilla Búlgara", sets: 3, reps: "10-15" }, { name: "Peso Muerto Rumano (RDL)", sets: 4, reps: "8-12" }, { name: "Hip Thrust", sets: 4, reps: "8-12" }, { name: "Extensiones Cuádriceps", sets: 3, reps: "15-20" }, { name: "Curl Femoral", sets: 3, reps: "12-15" }] },
-                day4: { title: "Espalda (Amplitud), Hombro Post., Bíceps + LISS", exercises: [{ name: "Dominadas o Jalón al Pecho", sets: 4, reps: "6-10" }, { name: "Jalón Agarre Neutro", sets: 3, reps: "10-15" }, { name: "Pullover en Polea", sets: 3, reps: "15-20" }, { name: "Elevaciones Laterales Polea", sets: 3, reps: "12-15" }, { name: "Face Pulls", sets: 4, reps: "15-20" }, { name: "Curl Predicador", sets: 3, reps: "10-15" }, { name: "Cardio LISS", sets: 1, reps: "30-40 min" }] },
-                day5: { title: "Pecho, Hombros (General), Tríceps + HIIT", exercises: [{ name: "Press Pecho Máquina", sets: 4, reps: "10-15" }, { name: "Aperturas Inclinadas", sets: 3, reps: "12-15" }, { name: "Press Arnold", sets: 3, reps: "10-15" }, { name: "Elevaciones Frontales", sets: 3, reps: "12-15" }, { name: "Patada Tríceps", sets: 3, reps: "12-15" }, { name: "Pushdown Cuerda", sets: 4, reps: "12-20" }, { name: "Cardio HIIT", sets: 1, reps: "20 min" }] }
-            };
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const macroData = { calorias: 2270, proteina: 225, carbs: 200, grasas: 63 };
+    const workoutData = {'1':{title:'Día 1: Pecho, Hombro Frontal/Lateral, Tríceps',exercises:[{name:'Press de Banca con Barra (Plano)'},{name:'Press Inclinado con Mancuernas'},{name:'Press Militar con Barra (Sentado)'},{name:'Elevaciones Laterales con Mancuernas'},{name:'Extensiones de Tríceps en Polea Alta'},{name:'Fondos en Paralelas (o Máquina)'},{name:'Crunch en Cable (de Rodillas)'},{name:'Elevaciones de Piernas Colgado'}]},'2':{title:'Día 2: Espalda (Densidad), Hombro Posterior, Bíceps',exercises:[{name:'Peso Muerto Rumano (RDL)'},{name:'Remo con Barra (Agarre Prono)'},{name:'Remo con Mancuerna (Una mano)'},{name:'Face Pulls'},{name:'Curl de Bíceps con Barra Z'},{name:'Curl Martillo con Mancuernas'},{name:'Curl de Muñeca (Palmas arriba/abajo)'}]},'3':{title:'Día 3: Piernas, Glúteos y Abdomen',exercises:[{name:'Prensa de Piernas'},{name:'Hip Thrust con Barra'},{name:'Curl de Isquiotibiales (Tumbado)'},{name:'Extensiones de Cuádriceps'},{name:'Abducción de Cadera en Máquina'},{name:'Elevación de Gemelos (de Pie)'},{name:'Plancha (Core)'},{name:'Plancha Lateral'}]},'4':{title:'Día 4: Espalda (Amplitud), Bíceps, Hombro Posterior',exercises:[{name:'Jalón al Pecho (Agarre Ancho)'},{name:'Remo en Polea Baja (Agarre Neutro)'},{name:'Pullover con Cable'},{name:'Elevaciones Posteriores (Pájaro)'},{name:'Curl Predicador con Barra Z'},{name:'Curl de Concentración'},{name:'Paseo del Granjero'}]},'5':{title:'Día 5: Pecho, Hombros, Tríceps (Hipertrofia)',exercises:[{name:'Press de Banca Inclinado con Barra'},{name:'Press de Hombros con Mancuernas'},{name:'Cruces en Polea Alta'},{name:'Elevaciones Laterales Sentado'},{name:'Extensiones Tríceps sobre Cabeza'},{name:'Press Francés con Mancuernas'},{name:'Rueda Abdominal'},{name:'Rotaciones Rusas con Peso'}]}};
+    const fullWorkoutData = {'1':{title:'Día 1: Pecho, Hombro, Tríceps',description:'Énfasis en fuerza e hipertrofia.',exercises:[{name:'Press de Banca con Barra (Plano)',sets:4,reps:'6-10',rest:'180s',rir:'2'},{name:'Press Inclinado con Mancuernas',sets:3,reps:'8-12',rest:'120s',rir:'1-2'},{name:'Press Militar con Barra (Sentado)',sets:4,reps:'6-10',rest:'150s',rir:'2'},{name:'Elevaciones Laterales',sets:4,reps:'12-15',rest:'75s',rir:'1'},{name:'Extensiones de Tríceps Polea',sets:3,reps:'12-15',rest:'75s',rir:'Drop set'},{name:'Fondos en Paralelas',sets:3,reps:'Al fallo',rest:'90s',rir:'0'},{name:'Crunch en Cable',sets:3,reps:'15-20',rest:'60s',rir:'1'},{name:'Elev. Piernas Colgado',sets:3,reps:'15-20',rest:'60s',rir:'1'}]},'2':{title:'Día 2: Espalda, Bíceps',description:'Construcción de densidad y fuerza.',exercises:[{name:'Peso Muerto Rumano (RDL)',sets:4,reps:'6-10',rest:'180s',rir:'2'},{name:'Remo con Barra',sets:4,reps:'6-10',rest:'150s',rir:'2'},{name:'Remo con Mancuerna',sets:3,reps:'8-12 c/b',rest:'90s',rir:'1-2'},{name:'Face Pulls',sets:4,reps:'15-20',rest:'75s',rir:'1'},{name:'Curl con Barra Z',sets:3,reps:'8-12',rest:'90s',rir:'1-2'},{name:'Curl Martillo',sets:3,reps:'10-15',rest:'75s',rir:'1'},{name:'Curl de Muñeca',sets:'3 c/u',reps:'15-20',rest:'60s',rir:'1'}]},'3':{title:'Día 3: Piernas y Abdomen',description:'Enfoque en hipertrofia y congestión.',exercises:[{name:'Prensa de Piernas',sets:4,reps:'10-15',rest:'120s',rir:'1-2'},{name:'Hip Thrust',sets:3,reps:'8-12',rest:'120s',rir:'1'},{name:'Curl Femoral',sets:3,reps:'12-15',rest:'90s',rir:'1'},{name:'Extensiones de Cuádriceps',sets:3,reps:'12-18',rest:'75s',rir:'1'},{name:'Abducción de Cadera',sets:3,reps:'15-20',rest:'60s',rir:'1'},{name:'Elevación de Gemelos',sets:4,reps:'15-20',rest:'60s',rir:'1'},{name:'Plancha',sets:3,reps:'45-60s',rest:'60s',rir:'N/A'}]},'4':{title:'Día 4: Espalda, Bíceps, Posterior',description:'Alto volumen para amplitud y detalle.',exercises:[{name:'Jalón al Pecho',sets:4,reps:'8-12',rest:'120s',rir:'1-2'},{name:'Remo en Polea Baja',sets:4,reps:'8-12',rest:'90s',rir:'1-2'},{name:'Pullover con Cable',sets:3,reps:'12-15',rest:'75s',rir:'1'},{name:'Pájaros',sets:3,reps:'15-20',rest:'75s',rir:'1'},{name:'Curl Predicador',sets:3,reps:'8-12',rest:'90s',rir:'1'},{name:'Curl Concentración',sets:3,reps:'10-15 c/b',rest:'60s',rir:'0-1'},{name:'Paseo del Granjero',sets:3,reps:'20-30m',rest:'90s',rir:'N/A'}]},'5':{title:'Día 5: Pecho, Hombros, Tríceps',description:'Énfasis en estrés metabólico.',exercises:[{name:'Press Inclinado con Barra',sets:4,reps:'8-12',rest:'120s',rir:'1-2'},{name:'Press Hombros Mancuernas',sets:4,reps:'8-12',rest:'120s',rir:'1-2'},{name:'Cruces en Polea',sets:3,reps:'12-15',rest:'75s',rir:'Drop set'},{name:'Elev. Laterales Sentado',sets:4,reps:'15-20',rest:'75s',rir:'1'},{name:'Ext. Tríceps sobre Cabeza',sets:3,reps:'10-15',rest:'75s',rir:'1'},{name:'Press Francés',sets:3,reps:'10-12',rest:'90s',rir:'1'},{name:'Rueda Abdominal',sets:3,reps:'8-15',rest:'75s',rir:'Fallo'},{name:'Rotaciones Rusas',sets:3,reps:'20-30',rest:'60s',rir:'1'}]}};
 
-            function generateWorkoutHTML(dayData) {
-                let html = `<div class="bg-brand-surface p-4 sm:p-6 rounded-lg shadow-lg">`;
-                html += `<h3 class="text-xl sm:text-2xl font-bold mb-4 text-brand-primary">${dayData.title}</h3>`;
-                html += `<div class="space-y-4">`;
-                dayData.exercises.forEach(ex => {
-                    html += `<div class="border-b border-gray-800 pb-3 last:border-b-0 flex justify-between items-center"><div><h4 class="font-semibold text-lg text-white">${ex.name}</h4></div><p class="font-bold text-brand-primary text-xl">${ex.sets} x ${ex.reps}</p></div>`;
-                });
-                html += `</div></div>`;
-                return html;
-            }
+    new Chart(document.getElementById('macroChart').getContext('2d'), { type: 'doughnut', data: { labels: ['Proteína', 'Carbs', 'Grasas'], datasets: [{ data: [macroData.proteina * 4, macroData.carbs * 4, macroData.grasas * 9], backgroundColor: ['#dc2626', '#f5f5f5', '#525252'], borderColor: '#181818', borderWidth: 4, hoverOffset: 8 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { color: '#e5e5e5' }}, tooltip: { callbacks: { label: c => `${c.label}: ${c.raw.toFixed(0)} kcal (${((c.raw/c.chart.getDatasetMeta(0).total)*100).toFixed(1)}%)` }}}} });
 
-            Object.keys(workoutData).forEach(dayId => {
-                const container = document.getElementById(dayId);
-                if (container) container.innerHTML = generateWorkoutHTML(workoutData[dayId]);
-            });
+    const navLinks = document.querySelectorAll('#main-nav a, #mobile-nav a');
+    const contentSections = document.querySelectorAll('.content-section');
+    navLinks.forEach(link => { link.addEventListener('click', e => { e.preventDefault(); const tabId = e.currentTarget.dataset.tab; contentSections.forEach(s => s.classList.remove('active')); document.getElementById(tabId).classList.add('active'); navLinks.forEach(l => l.classList.toggle('active', l.dataset.tab === tabId)); window.scrollTo({ top: 0, behavior: 'smooth' }); }); });
+    
+    const workoutNav = document.getElementById('workout-nav');
+    const workoutContent = document.getElementById('workout-content');
+    function renderWorkout(day) { const data = fullWorkoutData[day]; workoutContent.innerHTML = `<h3 class="text-xl font-bold mb-2 text-white">${data.title}</h3><p class="text-gray-400 mb-4">${data.description}</p><div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-left text-red-500 border-b border-gray-700"><th class="p-2">Ejercicio</th><th class="p-2 text-center">Series</th><th class="p-2 text-center">Reps</th><th class="p-2 text-center">Descanso</th><th class="p-2 text-center">RIR</th></tr></thead><tbody class="divide-y divide-gray-800">${data.exercises.map(ex => `<tr class="text-gray-300"><td class="p-2 font-semibold">${ex.name}</td><td class="p-2 text-center">${ex.sets}</td><td class="p-2 text-center">${ex.reps}</td><td class="p-2 text-center">${ex.rest}</td><td class="p-2 text-center font-bold text-red-500">${ex.rir}</td></tr>`).join('')}</tbody></table></div>`; }
+    workoutNav.addEventListener('click', e => { if (e.target.tagName === 'BUTTON') { const day = e.target.dataset.day; workoutNav.querySelectorAll('button').forEach(btn => btn.classList.remove('active')); e.target.classList.add('active'); renderWorkout(day); } });
+    renderWorkout('1');
 
-            document.getElementById('main-nav').addEventListener('click', (e) => {
-                const targetEl = e.target.closest('a');
-                if (!targetEl || !targetEl.dataset.target) return;
-                e.preventDefault();
-                const targetId = targetEl.dataset.target;
-                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-                document.getElementById(targetId).classList.add('active');
-                document.querySelectorAll('#main-nav .nav-link').forEach(l => l.classList.remove('active'));
-                targetEl.classList.add('active');
-            });
+    // Progress Tracking
+    let measurements = JSON.parse(localStorage.getItem('fitnessMeasurementsDR')) || [];
+    let notes = JSON.parse(localStorage.getItem('fitnessNotesDR')) || [];
+    let lifts = JSON.parse(localStorage.getItem('fitnessLiftsDR')) || [];
+    
+    const measureForm = document.getElementById('measurement-form');
+    const measureHistoryEl = document.getElementById('measurements-history');
+    const notesForm = document.getElementById('notes-form');
+    const notesHistoryEl = document.getElementById('notes-history');
+    const liftForm = document.getElementById('lift-form');
+    const liftHistoryEl = document.getElementById('lifts-history');
+    const liftExerciseSelect = document.getElementById('lift-exercise');
+    const liftFilterSelect = document.getElementById('lift-filter');
 
-            document.getElementById('routine-nav').addEventListener('click', (e) => {
-                const targetEl = e.target.closest('button');
-                if (!targetEl || !targetEl.dataset.day) return;
-                const dayId = targetEl.dataset.day;
-                document.querySelectorAll('.workout-day').forEach(d => d.classList.remove('active'));
-                document.getElementById(dayId).classList.add('active');
-                document.querySelectorAll('#routine-nav .day-btn').forEach(b => b.classList.remove('active'));
-                targetEl.classList.add('active');
-            });
-            
-            document.querySelectorAll('.accordion-header').forEach(header => {
-                header.addEventListener('click', () => {
-                    const content = header.nextElementSibling;
-                    const isOpen = content.style.maxHeight && content.style.maxHeight !== '0px';
-                    content.style.maxHeight = isOpen ? '0px' : content.scrollHeight + 'px';
-                    header.querySelector('span').classList.toggle('rotate-180', !isOpen);
-                });
-            });
-
-            document.getElementById('calculateRM').addEventListener('click', () => {
-                const weight = parseFloat(document.getElementById('rmWeight').value);
-                const reps = parseInt(document.getElementById('rmReps').value);
-                const resultDiv = document.getElementById('rmResult');
-                if (weight > 0 && reps > 0) {
-                    const rm = weight * (1 + reps / 30);
-                    resultDiv.querySelector('p:last-child').textContent = rm.toFixed(1) + ' kg';
-                    resultDiv.classList.remove('hidden');
-                }
-            });
-            
-            document.getElementById('calculatePlates').addEventListener('click', () => {
-                const totalWeight = parseFloat(document.getElementById('plateWeight').value);
-                const barWeight = 20;
-                const plateResultContent = document.getElementById('plateResultContent');
-                const resultDiv = document.getElementById('plateResult');
-
-                if (totalWeight >= barWeight && (totalWeight - barWeight) % 2.5 === 0) {
-                    let weightPerSide = (totalWeight - barWeight) / 2;
-                    const plates = [20, 15, 10, 5, 2.5, 1.25];
-                    let layout = '';
-                    plates.forEach(plate => {
-                        let count = Math.floor(weightPerSide / plate);
-                        if (count > 0) {
-                            layout += `<div class="bg-gray-800 p-2 rounded"><span>${count} x </span><span class="font-bold text-brand-primary">${plate} kg</span></div>`;
-                            weightPerSide -= count * plate;
-                        }
-                    });
-                    plateResultContent.innerHTML = layout || '<p>Solo la barra.</p>';
-                    resultDiv.classList.remove('hidden');
-                } else {
-                     plateResultContent.innerHTML = '<p class="col-span-full text-red-400">Peso inválido. Debe ser >= 20kg y en incrementos de 2.5kg.</p>';
-                     resultDiv.classList.remove('hidden');
-                }
-            });
-
-            Chart.defaults.color = '#A3A3A3';
-            new Chart('macroChart', {
-                type: 'doughnut',
-                data: {
-                    labels: ['Proteínas', 'Carbs', 'Grasas'],
-                    datasets: [{
-                        data: [180 * 4, 308 * 4, 72 * 9],
-                        backgroundColor: ['#DC2626', '#7C3AED', '#4B5563'], // Red, A different accent, Gray
-                        borderColor: '#191919',
-                        borderWidth: 4,
-                        hoverOffset: 10
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false, cutout: '70%',
-                    plugins: { legend: { display: false } }
-                }
-            });
+    const allExercises = [...new Set(Object.values(fullWorkoutData).flatMap(day => day.exercises.map(ex => ex.name)))].sort();
+    function populateExerciseSelects() {
+        liftFilterSelect.innerHTML = '<option value="all">Todos los Ejercicios</option>';
+        liftExerciseSelect.innerHTML = '<option value="">Selecciona Ejercicio</option>';
+        allExercises.forEach(ex => {
+            liftExerciseSelect.innerHTML += `<option value="${ex}">${ex}</option>`;
+            liftFilterSelect.innerHTML += `<option value="${ex}">${ex}</option>`;
         });
-    </script>
+    }
+
+    function renderMeasurements() { measurements.sort((a,b)=>new Date(b.date)-new Date(a.date)); measureHistoryEl.innerHTML = measurements.map(m=>`<tr><td class="p-2">${new Date(m.date).toLocaleDateString('es-CO',{timeZone:'UTC'})}</td><td class="p-2">${m.weight} kg</td><td class="p-2">${m.waist} cm</td><td class="p-2 text-right"><button class="btn-danger" data-id="${m.id}">X</button></td></tr>`).join(''); }
+    function renderNotes() { notes.sort((a,b)=>b.id-a.id); notesHistoryEl.innerHTML = notes.map(n=>`<div class="bg-black/20 p-3 rounded-lg"><p class="text-sm text-gray-300 whitespace-pre-wrap">${n.text}</p><div class="text-xs text-gray-500 mt-2 flex justify-between items-center">${n.date} <button class="btn-danger" data-id="${n.id}">X</button></div></div>`).join(''); }
+    function renderLifts() {
+        lifts.sort((a, b) => new Date(b.date) - new Date(a.date));
+        const filter = liftFilterSelect.value;
+        const filteredLifts = filter === 'all' ? lifts : lifts.filter(l => l.exercise === filter);
+        liftHistoryEl.innerHTML = filteredLifts.map(l => `<tr><td class="p-2">${new Date(l.date).toLocaleDateString('es-CO', {timeZone:'UTC'})}</td><td class="p-2 font-semibold">${l.exercise}</td><td class="p-2">${l.weight} kg</td><td class="p-2">${l.reps}</td><td class="p-2 text-right"><button class="btn-danger" data-id="${l.id}">X</button></td></tr>`).join('');
+    }
+
+    measureForm.addEventListener('submit', e=>{ e.preventDefault(); if(!e.target.elements['measure-date'].value) {alert('Selecciona una fecha.'); return;} measurements.push({id:Date.now(),date:e.target.elements['measure-date'].value,weight:e.target.elements['measure-weight'].value||'N/A',waist:e.target.elements['measure-waist'].value||'N/A'}); localStorage.setItem('fitnessMeasurementsDR', JSON.stringify(measurements)); renderMeasurements(); e.target.reset(); e.target.elements['measure-date'].valueAsDate = new Date(); });
+    notesForm.addEventListener('submit', e=>{ e.preventDefault(); const text=e.target.elements['note-text'].value.trim(); if(!text) return; notes.push({id:Date.now(),date:new Date().toLocaleString('es-CO'),text}); localStorage.setItem('fitnessNotesDR',JSON.stringify(notes)); renderNotes(); e.target.reset(); });
+    liftForm.addEventListener('submit', e=>{ e.preventDefault(); const exercise = e.target.elements['lift-exercise'].value; const weight = e.target.elements['lift-weight'].value; const reps = e.target.elements['lift-reps'].value; if(!exercise || !weight || !reps) { alert('Completa todos los campos del levantamiento.'); return;} lifts.push({id:Date.now(),date:new Date().toISOString().split('T')[0],exercise,weight,reps}); localStorage.setItem('fitnessLiftsDR',JSON.stringify(lifts)); renderLifts(); e.target.reset(); });
+    
+    measureHistoryEl.addEventListener('click', e => { if (e.target.classList.contains('btn-danger')) { measurements = measurements.filter(m => m.id !== Number(e.target.dataset.id)); localStorage.setItem('fitnessMeasurementsDR', JSON.stringify(measurements)); renderMeasurements(); } });
+    notesHistoryEl.addEventListener('click', e => { if (e.target.classList.contains('btn-danger')) { notes = notes.filter(n => n.id !== Number(e.target.dataset.id)); localStorage.setItem('fitnessNotesDR', JSON.stringify(notes)); renderNotes(); } });
+    liftHistoryEl.addEventListener('click', e => { if (e.target.classList.contains('btn-danger')) { lifts = lifts.filter(l => l.id !== Number(e.target.dataset.id)); localStorage.setItem('fitnessLiftsDR', JSON.stringify(lifts)); renderLifts(); } });
+    liftFilterSelect.addEventListener('change', renderLifts);
+
+    // Calculators
+    document.getElementById('1rm-form').addEventListener('submit', e => { e.preventDefault(); const w = parseFloat(e.target.elements['1rm-weight'].value); const r = parseInt(e.target.elements['1rm-reps'].value); if(w > 0 && r > 0){ const rm = w * (1 + (r/30)); document.getElementById('1rm-result').textContent = `1RM Estimado: ${rm.toFixed(1)} kg`; } else { document.getElementById('1rm-result').textContent = 'Datos inválidos'; } });
+    document.getElementById('rir-form').addEventListener('submit', e => { e.preventDefault(); const rm1 = parseFloat(e.target.elements['rir-1rm'].value); const reps = parseInt(e.target.elements['rir-reps'].value); const rir = parseInt(e.target.elements['rir-rir'].value); if(rm1 > 0 && reps > 0 && rir >= 0){ const totalReps = reps + rir; const intensity = 1 / (1 + (totalReps/30)); const weight = rm1 * intensity; document.getElementById('rir-result').textContent = `Peso Sugerido: ${weight.toFixed(1)} kg`; } else { document.getElementById('rir-result').textContent = 'Datos inválidos'; } });
+
+    document.getElementById('measure-date').valueAsDate = new Date();
+    populateExerciseSelects();
+    renderMeasurements();
+    renderNotes();
+    renderLifts();
+});
+</script>
 </body>
 </html>
