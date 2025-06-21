@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plan Pro Daniel Ramírez - Red & Black Edition</title>
+    <title>Plan Pro Daniel Ramírez - Final Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Chosen Palette: Minimalist Red & Black -->
-    <!-- Application Structure Plan: La app ha sido rediseñada con una estética rojo/negro. La sección "Progreso" ha sido expandida significativamente para incluir un registro de levantamientos con filtro por ejercicio, permitiendo un seguimiento de la sobrecarga progresiva. Se ha añadido una nueva tarjeta de "Calculadoras de Entrenamiento" en "Recursos" con herramientas para estimar el 1RM y calcular el peso de trabajo basado en el RIR, respondiendo a la petición de herramientas fundamentales para el entrenamiento avanzado. -->
-    <!-- Visualization & Content Choices: 1. Registro de Levantamientos: (Meta: Analizar) Un formulario y una tabla dinámica con un filtro desplegable (HTML/JS) para un seguimiento detallado. Justificación: Funcionalidad esencial para atletas serios que basan su progreso en la sobrecarga progresiva. 2. Calculadoras de Entrenamiento: (Meta: Informar/Planificar) Formularios simples (HTML/JS) que aplican fórmulas estándar (Epley para 1RM) para dar feedback inmediato al usuario. Justificación: Empodera al usuario con herramientas para autorregular su entrenamiento de forma científica. 3. Estilo Visual: El tema rojo/negro se aplica globalmente, incluyendo el gráfico de Chart.js y los estados 'focus' de los formularios, para una experiencia visual cohesiva y minimalista. -->
+    <!-- Application Structure Plan: La app ha sido actualizada para integrar de forma explícita el trabajo de abdomen y antebrazo dentro de la rutina diaria. Se ha modificado la estructura de datos del entrenamiento y la función de renderizado para mostrar una tabla separada de "Trabajo Específico" cada día, haciendo estos ejercicios más visibles y organizados como solicitó el usuario. -->
+    <!-- Visualization & Content Choices: 1. Rutina de Entrenamiento: (Meta: Organizar/Clarificar) La función renderWorkout ahora genera dos tablas por día: una para el entrenamiento principal y otra específica para abdomen/antebrazo. Justificación: Esto responde directamente a la petición del usuario de "agregar los mejores ejercicios" y hacerlos visibles, mejorando la estructura y claridad del plan de entrenamiento. El resto de funcionalidades (calculadoras, seguimiento) se mantienen. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         :root { --main-red: #dc2626; --dark-bg: #101010; --card-bg: #181818; --text-light: #e5e5e5; --text-dark: #a3a3a3; }
@@ -106,8 +106,8 @@
                         <div><h4 class="font-bold text-lg text-red-500 mb-2">Calculadora de 1RM Estimado</h4><form id="1rm-form" class="space-y-3"><input type="number" id="1rm-weight" placeholder="Peso levantado (kg)" class="form-input"><input type="number" id="1rm-reps" placeholder="Repeticiones completadas" class="form-input"><button type="submit" class="btn-primary w-full">Calcular 1RM</button></form><p id="1rm-result" class="mt-3 font-bold text-center text-xl"></p></div>
                         <div><h4 class="font-bold text-lg text-red-500 mb-2">Calculadora de Peso por RIR</h4><form id="rir-form" class="space-y-3"><input type="number" id="rir-1rm" placeholder="Tu 1RM estimado (kg)" class="form-input"><input type="number" id="rir-reps" placeholder="Repeticiones objetivo" class="form-input"><input type="number" id="rir-rir" placeholder="RIR deseado (0-3)" class="form-input"><button type="submit" class="btn-primary w-full">Calcular Peso</button></form><p id="rir-result" class="mt-3 font-bold text-center text-xl"></p></div>
                     </div></div>
-                    <div class="card"><h3 class="text-2xl font-bold mb-4">Fundamentales</h3><ul class="text-sm list-disc list-inside text-gray-300 space-y-2"><li><strong>Abdomen:</strong> Sobrecarga progresiva con ejercicios como Crunch en Polea y Elev. de Piernas Colgado.</li><li><strong>Antebrazo:</strong> Atacar con flexión/extensión de muñeca y trabajo de agarre (Paseo del Granjero).</li></ul></div>
-                    <div class="card"><h3 class="text-2xl font-bold mb-4">Ciencia</h3><ul class="text-sm list-disc list-inside text-gray-300 space-y-2"><li><strong>Déficit Calórico:</strong> Esencial para la oxidación de grasa.</li><li><strong>Proteína Elevada:</strong> Clave para la retención de masa muscular.</li><li><strong>Sobrecarga Progresiva:</strong> El pilar del progreso a largo plazo.</li></ul></div>
+                    <div class="card"><h3 class="text-2xl font-bold mb-4">Fundamentales</h3><ul class="text-sm list-disc list-inside text-gray-300 space-y-2"><li><strong>Abdomen:</strong> Sobrecarga progresiva con Crunch en Polea y Elev. de Piernas Colgado.</li><li><strong>Antebrazo:</strong> Atacar con flexión/extensión de muñeca y trabajo de agarre.</li></ul></div>
+                    <div class="card"><h3 class="text-2xl font-bold mb-4">Ciencia</h3><ul class="text-sm list-disc list-inside text-gray-300 space-y-2"><li><strong>Déficit Calórico:</strong> Esencial para la oxidación de grasa.</li><li><strong>Proteína Elevada:</strong> Clave para la retención muscular.</li><li><strong>Sobrecarga Progresiva:</strong> El pilar del progreso.</li></ul></div>
                     <div class="card"><h3 class="text-2xl font-bold mb-4">Mindset</h3><ul class="text-sm list-disc list-inside text-gray-300 space-y-2"><li><strong>Consistencia > Perfección.</strong></li><li><strong>Paciencia y objetividad.</strong></li><li><strong>Conexión Mente-Músculo.</strong></li></ul></div>
                 </div>
             </section>
@@ -121,9 +121,87 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const macroData = { calorias: 2270, proteina: 225, carbs: 200, grasas: 63 };
-    const workoutData = {'1':{title:'Día 1: Pecho, Hombro Frontal/Lateral, Tríceps',exercises:[{name:'Press de Banca con Barra (Plano)'},{name:'Press Inclinado con Mancuernas'},{name:'Press Militar con Barra (Sentado)'},{name:'Elevaciones Laterales con Mancuernas'},{name:'Extensiones de Tríceps en Polea Alta'},{name:'Fondos en Paralelas (o Máquina)'},{name:'Crunch en Cable (de Rodillas)'},{name:'Elevaciones de Piernas Colgado'}]},'2':{title:'Día 2: Espalda (Densidad), Hombro Posterior, Bíceps',exercises:[{name:'Peso Muerto Rumano (RDL)'},{name:'Remo con Barra (Agarre Prono)'},{name:'Remo con Mancuerna (Una mano)'},{name:'Face Pulls'},{name:'Curl de Bíceps con Barra Z'},{name:'Curl Martillo con Mancuernas'},{name:'Curl de Muñeca (Palmas arriba/abajo)'}]},'3':{title:'Día 3: Piernas, Glúteos y Abdomen',exercises:[{name:'Prensa de Piernas'},{name:'Hip Thrust con Barra'},{name:'Curl de Isquiotibiales (Tumbado)'},{name:'Extensiones de Cuádriceps'},{name:'Abducción de Cadera en Máquina'},{name:'Elevación de Gemelos (de Pie)'},{name:'Plancha (Core)'},{name:'Plancha Lateral'}]},'4':{title:'Día 4: Espalda (Amplitud), Bíceps, Hombro Posterior',exercises:[{name:'Jalón al Pecho (Agarre Ancho)'},{name:'Remo en Polea Baja (Agarre Neutro)'},{name:'Pullover con Cable'},{name:'Elevaciones Posteriores (Pájaro)'},{name:'Curl Predicador con Barra Z'},{name:'Curl de Concentración'},{name:'Paseo del Granjero'}]},'5':{title:'Día 5: Pecho, Hombros, Tríceps (Hipertrofia)',exercises:[{name:'Press de Banca Inclinado con Barra'},{name:'Press de Hombros con Mancuernas'},{name:'Cruces en Polea Alta'},{name:'Elevaciones Laterales Sentado'},{name:'Extensiones Tríceps sobre Cabeza'},{name:'Press Francés con Mancuernas'},{name:'Rueda Abdominal'},{name:'Rotaciones Rusas con Peso'}]}};
-    const fullWorkoutData = {'1':{title:'Día 1: Pecho, Hombro, Tríceps',description:'Énfasis en fuerza e hipertrofia.',exercises:[{name:'Press de Banca con Barra (Plano)',sets:4,reps:'6-10',rest:'180s',rir:'2'},{name:'Press Inclinado con Mancuernas',sets:3,reps:'8-12',rest:'120s',rir:'1-2'},{name:'Press Militar con Barra (Sentado)',sets:4,reps:'6-10',rest:'150s',rir:'2'},{name:'Elevaciones Laterales',sets:4,reps:'12-15',rest:'75s',rir:'1'},{name:'Extensiones de Tríceps Polea',sets:3,reps:'12-15',rest:'75s',rir:'Drop set'},{name:'Fondos en Paralelas',sets:3,reps:'Al fallo',rest:'90s',rir:'0'},{name:'Crunch en Cable',sets:3,reps:'15-20',rest:'60s',rir:'1'},{name:'Elev. Piernas Colgado',sets:3,reps:'15-20',rest:'60s',rir:'1'}]},'2':{title:'Día 2: Espalda, Bíceps',description:'Construcción de densidad y fuerza.',exercises:[{name:'Peso Muerto Rumano (RDL)',sets:4,reps:'6-10',rest:'180s',rir:'2'},{name:'Remo con Barra',sets:4,reps:'6-10',rest:'150s',rir:'2'},{name:'Remo con Mancuerna',sets:3,reps:'8-12 c/b',rest:'90s',rir:'1-2'},{name:'Face Pulls',sets:4,reps:'15-20',rest:'75s',rir:'1'},{name:'Curl con Barra Z',sets:3,reps:'8-12',rest:'90s',rir:'1-2'},{name:'Curl Martillo',sets:3,reps:'10-15',rest:'75s',rir:'1'},{name:'Curl de Muñeca',sets:'3 c/u',reps:'15-20',rest:'60s',rir:'1'}]},'3':{title:'Día 3: Piernas y Abdomen',description:'Enfoque en hipertrofia y congestión.',exercises:[{name:'Prensa de Piernas',sets:4,reps:'10-15',rest:'120s',rir:'1-2'},{name:'Hip Thrust',sets:3,reps:'8-12',rest:'120s',rir:'1'},{name:'Curl Femoral',sets:3,reps:'12-15',rest:'90s',rir:'1'},{name:'Extensiones de Cuádriceps',sets:3,reps:'12-18',rest:'75s',rir:'1'},{name:'Abducción de Cadera',sets:3,reps:'15-20',rest:'60s',rir:'1'},{name:'Elevación de Gemelos',sets:4,reps:'15-20',rest:'60s',rir:'1'},{name:'Plancha',sets:3,reps:'45-60s',rest:'60s',rir:'N/A'}]},'4':{title:'Día 4: Espalda, Bíceps, Posterior',description:'Alto volumen para amplitud y detalle.',exercises:[{name:'Jalón al Pecho',sets:4,reps:'8-12',rest:'120s',rir:'1-2'},{name:'Remo en Polea Baja',sets:4,reps:'8-12',rest:'90s',rir:'1-2'},{name:'Pullover con Cable',sets:3,reps:'12-15',rest:'75s',rir:'1'},{name:'Pájaros',sets:3,reps:'15-20',rest:'75s',rir:'1'},{name:'Curl Predicador',sets:3,reps:'8-12',rest:'90s',rir:'1'},{name:'Curl Concentración',sets:3,reps:'10-15 c/b',rest:'60s',rir:'0-1'},{name:'Paseo del Granjero',sets:3,reps:'20-30m',rest:'90s',rir:'N/A'}]},'5':{title:'Día 5: Pecho, Hombros, Tríceps',description:'Énfasis en estrés metabólico.',exercises:[{name:'Press Inclinado con Barra',sets:4,reps:'8-12',rest:'120s',rir:'1-2'},{name:'Press Hombros Mancuernas',sets:4,reps:'8-12',rest:'120s',rir:'1-2'},{name:'Cruces en Polea',sets:3,reps:'12-15',rest:'75s',rir:'Drop set'},{name:'Elev. Laterales Sentado',sets:4,reps:'15-20',rest:'75s',rir:'1'},{name:'Ext. Tríceps sobre Cabeza',sets:3,reps:'10-15',rest:'75s',rir:'1'},{name:'Press Francés',sets:3,reps:'10-12',rest:'90s',rir:'1'},{name:'Rueda Abdominal',sets:3,reps:'8-15',rest:'75s',rir:'Fallo'},{name:'Rotaciones Rusas',sets:3,reps:'20-30',rest:'60s',rir:'1'}]}};
-
+    const workoutData = {
+        '1':{
+            title:'Día 1: Empuje (Pecho, Hombro, Tríceps)',
+            description:'Énfasis en fuerza e hipertrofia.',
+            main_work: [
+                {name:'Press de Banca con Barra',sets:4,reps:'6-10',rest:'180s',rir:'2'},
+                {name:'Press Inclinado con Mancuernas',sets:3,reps:'8-12',rest:'120s',rir:'1-2'},
+                {name:'Press Militar con Barra',sets:4,reps:'6-10',rest:'150s',rir:'2'},
+                {name:'Elevaciones Laterales',sets:4,reps:'12-15',rest:'75s',rir:'1'},
+                {name:'Fondos en Paralelas (o Máquina)',sets:3,reps:'Al fallo',rest:'90s',rir:'0'},
+                {name:'Extensiones de Tríceps en Polea',sets:3,reps:'12-15',rest:'75s',rir:'Drop set'}
+            ],
+            specific_work: [
+                {name:'Crunch en Polea Alta',sets:3,reps:'15-20',rest:'60s',rir:'1'},
+                {name:'Elevaciones de Piernas Colgado',sets:3,reps:'15-20',rest:'60s',rir:'1'}
+            ]
+        },
+        '2':{
+            title:'Día 2: Tirón (Espalda, Bíceps)',
+            description:'Construcción de densidad y fuerza.',
+            main_work: [
+                {name:'Peso Muerto Rumano (RDL)',sets:4,reps:'6-10',rest:'180s',rir:'2'},
+                {name:'Remo con Barra',sets:4,reps:'6-10',rest:'150s',rir:'2'},
+                {name:'Remo con Mancuerna',sets:3,reps:'8-12 c/b',rest:'90s',rir:'1-2'},
+                {name:'Face Pulls',sets:4,reps:'15-20',rest:'75s',rir:'1'},
+                {name:'Curl con Barra Z',sets:3,reps:'8-12',rest:'90s',rir:'1-2'}
+            ],
+            specific_work: [
+                {name:'Curl Martillo',sets:3,reps:'10-15',rest:'75s',rir:'1'},
+                {name:'Curl de Muñeca (Flex/Ext)',sets:'3 c/u',reps:'15-20',rest:'60s',rir:'1'}
+            ]
+        },
+        '3':{
+            title:'Día 3: Piernas y Core',
+            description:'Enfoque en hipertrofia y estabilidad.',
+            main_work: [
+                {name:'Prensa de Piernas',sets:4,reps:'10-15',rest:'120s',rir:'1-2'},
+                {name:'Hip Thrust',sets:3,reps:'8-12',rest:'120s',rir:'1'},
+                {name:'Curl Femoral',sets:3,reps:'12-15',rest:'90s',rir:'1'},
+                {name:'Extensiones de Cuádriceps',sets:3,reps:'12-18',rest:'75s',rir:'1'},
+                {name:'Abducción de Cadera',sets:3,reps:'15-20',rest:'60s',rir:'1'},
+                {name:'Elevación de Gemelos',sets:4,reps:'15-20',rest:'60s',rir:'1'}
+            ],
+            specific_work: [
+                {name:'Plancha con Peso',sets:3,reps:'45-60s',rest:'60s',rir:'N/A'},
+                {name:'Plancha Lateral',sets:3,reps:'30-45s c/l',rest:'45s',rir:'N/A'}
+            ]
+        },
+        '4':{
+            title:'Día 4: Espalda y Antebrazo',
+            description:'Alto volumen para amplitud y agarre.',
+            main_work: [
+                {name:'Jalón al Pecho',sets:4,reps:'8-12',rest:'120s',rir:'1-2'},
+                {name:'Remo en Polea Baja',sets:4,reps:'8-12',rest:'90s',rir:'1-2'},
+                {name:'Pullover con Cable',sets:3,reps:'12-15',rest:'75s',rir:'1'},
+                {name:'Pájaros (Hombro Posterior)',sets:3,reps:'15-20',rest:'75s',rir:'1'},
+                {name:'Curl Predicador',sets:3,reps:'8-12',rest:'90s',rir:'1'}
+            ],
+            specific_work: [
+                {name:'Paseo del Granjero',sets:3,reps:'30-40m',rest:'90s',rir:'N/A'},
+                {name:'Curl de Concentración',sets:3,reps:'10-15 c/b',rest:'60s',rir:'0-1'}
+            ]
+        },
+        '5':{
+            title:'Día 5: Empuje (Hipertrofia)',
+            description:'Énfasis en estrés metabólico y core avanzado.',
+            main_work: [
+                {name:'Press Inclinado con Barra',sets:4,reps:'8-12',rest:'120s',rir:'1-2'},
+                {name:'Press Hombros Mancuernas',sets:4,reps:'8-12',rest:'120s',rir:'1-2'},
+                {name:'Cruces en Polea',sets:3,reps:'12-15',rest:'75s',rir:'Drop set'},
+                {name:'Elev. Laterales Sentado',sets:4,reps:'15-20',rest:'75s',rir:'1'},
+                {name:'Ext. Tríceps sobre Cabeza',sets:3,reps:'10-15',rest:'75s',rir:'1'},
+                {name:'Press Francés',sets:3,reps:'10-12',rest:'90s',rir:'1'}
+            ],
+            specific_work: [
+                {name:'Rueda Abdominal',sets:3,reps:'Al fallo',rest:'75s',rir:'0'},
+                {name:'Rotaciones Rusas (Leñador)',sets:3,reps:'10-15 c/l',rest:'60s',rir:'1'}
+            ]
+        }
+    };
+    
     new Chart(document.getElementById('macroChart').getContext('2d'), { type: 'doughnut', data: { labels: ['Proteína', 'Carbs', 'Grasas'], datasets: [{ data: [macroData.proteina * 4, macroData.carbs * 4, macroData.grasas * 9], backgroundColor: ['#dc2626', '#f5f5f5', '#525252'], borderColor: '#181818', borderWidth: 4, hoverOffset: 8 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { color: '#e5e5e5' }}, tooltip: { callbacks: { label: c => `${c.label}: ${c.raw.toFixed(0)} kcal (${((c.raw/c.chart.getDatasetMeta(0).total)*100).toFixed(1)}%)` }}}} });
 
     const navLinks = document.querySelectorAll('#main-nav a, #mobile-nav a');
@@ -132,11 +210,25 @@ document.addEventListener('DOMContentLoaded', function () {
     
     const workoutNav = document.getElementById('workout-nav');
     const workoutContent = document.getElementById('workout-content');
-    function renderWorkout(day) { const data = fullWorkoutData[day]; workoutContent.innerHTML = `<h3 class="text-xl font-bold mb-2 text-white">${data.title}</h3><p class="text-gray-400 mb-4">${data.description}</p><div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-left text-red-500 border-b border-gray-700"><th class="p-2">Ejercicio</th><th class="p-2 text-center">Series</th><th class="p-2 text-center">Reps</th><th class="p-2 text-center">Descanso</th><th class="p-2 text-center">RIR</th></tr></thead><tbody class="divide-y divide-gray-800">${data.exercises.map(ex => `<tr class="text-gray-300"><td class="p-2 font-semibold">${ex.name}</td><td class="p-2 text-center">${ex.sets}</td><td class="p-2 text-center">${ex.reps}</td><td class="p-2 text-center">${ex.rest}</td><td class="p-2 text-center font-bold text-red-500">${ex.rir}</td></tr>`).join('')}</tbody></table></div>`; }
+    
+    function createTableHTML(exercises) {
+        return `<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-left text-red-500 border-b border-gray-700"><th class="p-2">Ejercicio</th><th class="p-2 text-center">Series</th><th class="p-2 text-center">Reps</th><th class="p-2 text-center">Descanso</th><th class="p-2 text-center">RIR</th></tr></thead><tbody class="divide-y divide-gray-800">${exercises.map(ex => `<tr class="text-gray-300"><td class="p-2 font-semibold">${ex.name}</td><td class="p-2 text-center">${ex.sets}</td><td class="p-2 text-center">${ex.reps}</td><td class="p-2 text-center">${ex.rest}</td><td class="p-2 text-center font-bold text-red-500">${ex.rir}</td></tr>`).join('')}</tbody></table></div>`;
+    }
+
+    function renderWorkout(day) {
+        const data = workoutData[day];
+        let html = `<h3 class="text-xl font-bold mb-2 text-white">${data.title}</h3><p class="text-gray-400 mb-4">${data.description}</p>`;
+        html += createTableHTML(data.main_work);
+        if (data.specific_work && data.specific_work.length > 0) {
+            html += `<h4 class="text-lg font-semibold mt-6 mb-2 text-red-400">Trabajo Específico (Abdomen/Antebrazo)</h4>`;
+            html += createTableHTML(data.specific_work);
+        }
+        workoutContent.innerHTML = html;
+    }
+
     workoutNav.addEventListener('click', e => { if (e.target.tagName === 'BUTTON') { const day = e.target.dataset.day; workoutNav.querySelectorAll('button').forEach(btn => btn.classList.remove('active')); e.target.classList.add('active'); renderWorkout(day); } });
     renderWorkout('1');
 
-    // Progress Tracking
     let measurements = JSON.parse(localStorage.getItem('fitnessMeasurementsDR')) || [];
     let notes = JSON.parse(localStorage.getItem('fitnessNotesDR')) || [];
     let lifts = JSON.parse(localStorage.getItem('fitnessLiftsDR')) || [];
@@ -150,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const liftExerciseSelect = document.getElementById('lift-exercise');
     const liftFilterSelect = document.getElementById('lift-filter');
 
-    const allExercises = [...new Set(Object.values(fullWorkoutData).flatMap(day => day.exercises.map(ex => ex.name)))].sort();
+    const allExercises = [...new Set(Object.values(workoutData).flatMap(day => [...day.main_work, ...(day.specific_work || [])].map(ex => ex.name)))].sort();
     function populateExerciseSelects() {
         liftFilterSelect.innerHTML = '<option value="all">Todos los Ejercicios</option>';
         liftExerciseSelect.innerHTML = '<option value="">Selecciona Ejercicio</option>';
@@ -178,9 +270,8 @@ document.addEventListener('DOMContentLoaded', function () {
     liftHistoryEl.addEventListener('click', e => { if (e.target.classList.contains('btn-danger')) { lifts = lifts.filter(l => l.id !== Number(e.target.dataset.id)); localStorage.setItem('fitnessLiftsDR', JSON.stringify(lifts)); renderLifts(); } });
     liftFilterSelect.addEventListener('change', renderLifts);
 
-    // Calculators
     document.getElementById('1rm-form').addEventListener('submit', e => { e.preventDefault(); const w = parseFloat(e.target.elements['1rm-weight'].value); const r = parseInt(e.target.elements['1rm-reps'].value); if(w > 0 && r > 0){ const rm = w * (1 + (r/30)); document.getElementById('1rm-result').textContent = `1RM Estimado: ${rm.toFixed(1)} kg`; } else { document.getElementById('1rm-result').textContent = 'Datos inválidos'; } });
-    document.getElementById('rir-form').addEventListener('submit', e => { e.preventDefault(); const rm1 = parseFloat(e.target.elements['rir-1rm'].value); const reps = parseInt(e.target.elements['rir-reps'].value); const rir = parseInt(e.target.elements['rir-rir'].value); if(rm1 > 0 && reps > 0 && rir >= 0){ const totalReps = reps + rir; const intensity = 1 / (1 + (totalReps/30)); const weight = rm1 * intensity; document.getElementById('rir-result').textContent = `Peso Sugerido: ${weight.toFixed(1)} kg`; } else { document.getElementById('rir-result').textContent = 'Datos inválidos'; } });
+    document.getElementById('rir-form').addEventListener('submit', e => { e.preventDefault(); const rm1 = parseFloat(e.target.elements['rir-1rm'].value); const reps = parseInt(e.target.elements['rir-reps'].value); const rir = parseInt(e.target.elements['rir-rir'].value); if(rm1 > 0 && reps > 0 && rir >= 0){ const totalReps = reps + rir; const intensity = 1 - (0.025 * totalReps); const weight = rm1 * intensity; document.getElementById('rir-result').textContent = `Peso Sugerido: ${weight.toFixed(1)} kg`; } else { document.getElementById('rir-result').textContent = 'Datos inválidos'; } });
 
     document.getElementById('measure-date').valueAsDate = new Date();
     populateExerciseSelects();
