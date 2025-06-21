@@ -3,248 +3,280 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plan de Entrenamiento</title>
+    <title>Panel de Control de Entrenamiento</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/phosphor-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Warm Neutrals (Stone, with Teal accent) -->
+    <!-- Application Structure Plan: A tabbed SPA design with a main dashboard for quick stats, and dedicated sections for Nutrition, the interactive Weekly Routine, Cardio/Progression, and Scientific Fundamentals. This task-oriented structure breaks down the dense report into manageable, interactive views, prioritizing daily actionable information (Dashboard, Routine) while keeping detailed explanations accessible but separate, which is more user-friendly than a single long scroll. -->
+    <!-- Visualization & Content Choices: Nutrition: Donut chart (Chart.js/Canvas) for macro calorie split -> Goal: Compare proportions -> Interaction: Hover tooltips. Weekly Routine: Tabbed interface (HTML/JS) showing daily workouts -> Goal: Organize & Inform -> Interaction: Click to switch days. Periodization: Visual flowchart (HTML/Tailwind) -> Goal: Show change over time -> No interaction needed, visual structure is key. Scientific Text: Accordions (HTML/JS) -> Goal: Organize dense text -> Interaction: Click to expand/collapse. All choices avoid SVG/Mermaid and focus on making complex data digestible. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #111827; /* Dark Gray */
-            color: #F3F4F6; /* Light Gray */
         }
-        .nav-active {
-            background-color: #4f46e5; /* Indigo */
-            color: #FFFFFF;
-        }
-        .nav-item {
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .nav-item:hover {
-            background-color: #374151;
-        }
-        .content-section {
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        .page {
             display: none;
         }
-        .content-section.active {
+        .page.active {
             display: block;
-            animation: fadeIn 0.5s;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .nav-link {
+            transition: all 0.3s ease;
         }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #1F2937; }
-        ::-webkit-scrollbar-thumb { background: #4B5563; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #6B7280; }
+        .nav-link.active {
+            color: #0d9488; /* teal-600 */
+            border-bottom-color: #0d9488;
+        }
+        .day-btn.active {
+            background-color: #0d9488; /* teal-600 */
+            color: white;
+        }
+        .workout-day {
+            display: none;
+        }
+        .workout-day.active {
+            display: block;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            max-height: 350px;
+        }
+        @media (min-width: 640px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
     </style>
 </head>
-<body class="antialiased">
+<body class="bg-stone-100 text-stone-800">
 
-    <div class="container mx-auto max-w-4xl p-4">
-        <header class="text-center mb-6">
-            <h1 class="text-3xl md:text-4xl font-bold text-white">Tu Plan de Transformación</h1>
-            <p class="text-indigo-400 mt-2 font-semibold">Programa de Entrenamiento y Nutrición</p>
+    <div class="max-w-7xl mx-auto min-h-screen bg-stone-50 shadow-lg">
+        <header class="bg-white p-4 sm:p-6 border-b border-stone-200 sticky top-0 z-10">
+            <div class="flex flex-col sm:flex-row justify-between items-center">
+                <h1 class="text-2xl sm:text-3xl font-bold text-stone-900 mb-4 sm:mb-0">Plan de Recomposición Corporal</h1>
+                <nav id="main-nav" class="flex flex-wrap justify-center space-x-2 sm:space-x-4">
+                    <a href="#" data-target="dashboard" class="nav-link active text-sm sm:text-base font-medium border-b-2 border-transparent pb-1 px-2">Panel</a>
+                    <a href="#" data-target="nutrition" class="nav-link text-sm sm:text-base font-medium border-b-2 border-transparent pb-1 px-2">Nutrición</a>
+                    <a href="#" data-target="routine" class="nav-link text-sm sm:text-base font-medium border-b-2 border-transparent pb-1 px-2">Rutina</a>
+                    <a href="#" data-target="cardio-progression" class="nav-link text-sm sm:text-base font-medium border-b-2 border-transparent pb-1 px-2">Cardio y Progreso</a>
+                    <a href="#" data-target="fundamentals" class="nav-link text-sm sm:text-base font-medium border-b-2 border-transparent pb-1 px-2">Fundamentos</a>
+                </nav>
+            </div>
         </header>
 
-        <nav class="bg-gray-800 rounded-lg p-2 flex flex-wrap justify-around mb-6 text-sm md:text-base">
-            <a class="nav-item nav-active flex-1 text-center py-2 px-3 rounded-md" data-target="hoy">
-                <i class="ph-house-line inline-block align-middle mr-1"></i> Hoy
-            </a>
-            <a class="nav-item flex-1 text-center py-2 px-3 rounded-md" data-target="entrenamiento">
-                <i class="ph-barbell inline-block align-middle mr-1"></i> Entrenamiento
-            </a>
-            <a class="nav-item flex-1 text-center py-2 px-3 rounded-md" data-target="nutricion">
-                <i class="ph-fork-knife inline-block align-middle mr-1"></i> Nutrición
-            </a>
-            <a class="nav-item flex-1 text-center py-2 px-3 rounded-md" data-target="cardio">
-                <i class="ph-heartbeat inline-block align-middle mr-1"></i> Cardio
-            </a>
-        </nav>
-
-        <main id="main-content">
-            <section id="hoy" class="content-section active">
-                <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
-                    <h2 class="text-2xl font-bold mb-4 flex items-center"><i class="ph-calendar-check text-indigo-400 mr-3"></i>Enfoque del Día: <span id="today-title"></span></h2>
-                    <div id="today-workout-summary" class="mb-6">
-                        <h3 class="text-xl font-semibold mb-3">🏋️ Entrenamiento de Hoy</h3>
-                        <div id="today-workout-content" class="space-y-3"></div>
+        <main id="content-area" class="p-4 sm:p-6 lg:p-8">
+            <!-- Dashboard Page -->
+            <section id="dashboard" class="page active">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-teal-700 mb-2">Panel de Control Diario</h2>
+                    <p class="text-stone-600 max-w-2xl mx-auto">Tus objetivos nutricionales y tu plan de entrenamiento semanal de un vistazo. La consistencia en estos dos frentes es la clave para la recomposición corporal.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Nutrition Summary -->
+                    <div>
+                        <h3 class="text-2xl font-semibold mb-4 text-stone-700">Metas Nutricionales Diarias</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-white p-4 rounded-lg shadow-md text-center">
+                                <h4 class="text-sm font-medium text-stone-500">Calorías</h4>
+                                <p class="text-3xl font-bold text-teal-600">2550</p>
+                                <p class="text-xs text-stone-400">kcal</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg shadow-md text-center">
+                                <h4 class="text-sm font-medium text-stone-500">Proteínas</h4>
+                                <p class="text-3xl font-bold text-teal-600">180</p>
+                                <p class="text-xs text-stone-400">gramos</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg shadow-md text-center">
+                                <h4 class="text-sm font-medium text-stone-500">Carbohidratos</h4>
+                                <p class="text-3xl font-bold text-teal-600">298</p>
+                                <p class="text-xs text-stone-400">gramos</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg shadow-md text-center">
+                                <h4 class="text-sm font-medium text-stone-500">Grasas</h4>
+                                <p class="text-3xl font-bold text-teal-600">71</p>
+                                <p class="text-xs text-stone-400">gramos</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-md mt-4">
+                            <h4 class="text-lg font-semibold text-center mb-2 text-stone-700">Distribución Calórica</h4>
+                            <div class="chart-container max-w-xs mx-auto">
+                                <canvas id="macroChart"></canvas>
+                            </div>
+                        </div>
                     </div>
-                    <div id="today-nutrition-summary">
-                        <h3 class="text-xl font-semibold mb-3">🍎 Nutrición de Hoy</h3>
-                        <div id="today-nutrition-content" class="bg-gray-700 p-4 rounded-md grid grid-cols-2 md:grid-cols-4 gap-4 text-center"></div>
+
+                    <!-- Weekly Schedule -->
+                    <div>
+                        <h3 class="text-2xl font-semibold mb-4 text-stone-700">Plan de Entrenamiento Semanal</h3>
+                        <div class="space-y-3">
+                            <div class="bg-white p-4 rounded-lg shadow-md">
+                                <p class="font-bold">Día 1: <span class="font-normal text-teal-800">Pecho, Hombro (Frontal/Lateral), Tríceps, Abdomen</span></p>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg shadow-md">
+                                <p class="font-bold">Día 2: <span class="font-normal text-teal-800">Espalda (Densidad), Hombro Post., Bíceps, Antebrazo + LISS</span></p>
+                            </div>
+                             <div class="bg-white p-4 rounded-lg shadow-md">
+                                <p class="font-bold">Día 3: <span class="font-normal text-teal-800">Piernas, Glúteos, Abdomen</span></p>
+                            </div>
+                             <div class="bg-white p-4 rounded-lg shadow-md">
+                                <p class="font-bold">Día 4: <span class="font-normal text-teal-800">Espalda (Amplitud), Hombro Post., Bíceps, Antebrazo + LISS</span></p>
+                            </div>
+                             <div class="bg-white p-4 rounded-lg shadow-md">
+                                <p class="font-bold">Día 5: <span class="font-normal text-teal-800">Pecho, Hombros (General), Tríceps, Abdomen + HIIT</span></p>
+                            </div>
+                             <div class="bg-stone-200 p-4 rounded-lg text-center">
+                                <p class="font-bold text-stone-600">Día 6 y 7: <span class="font-normal">Descanso y Recuperación Activa</span></p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <section id="entrenamiento" class="content-section">
-                <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
-                    <h2 class="text-2xl font-bold mb-4"><i class="ph-barbell text-indigo-400 mr-3"></i>Programa de Entrenamiento Semanal</h2>
-                    <div class="space-y-4" id="workout-plan"></div>
+            <!-- Nutrition Page -->
+            <section id="nutrition" class="page">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-teal-700 mb-2">Plan Nutricional Detallado</h2>
+                    <p class="text-stone-600 max-w-3xl mx-auto">La nutrición es el 70% de la batalla. Esta sección desglosa el porqué de tus objetivos calóricos y de macronutrientes, basándose en la ciencia para crear un déficit controlado que impulse la pérdida de grasa sin sacrificar el músculo.</p>
                 </div>
-            </section>
-
-            <section id="nutricion" class="content-section">
-                <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
-                    <h2 class="text-2xl font-bold mb-4"><i class="ph-fork-knife text-indigo-400 mr-3"></i>Plan Nutricional: Ciclado de Carbohidratos</h2>
-                    <p class="text-gray-400 mb-6">Alinea tu ingesta calórica con la demanda de tus entrenamientos para maximizar el rendimiento y la quema de grasa.</p>
-                    <div class="overflow-x-auto mb-6">
-                        <table class="w-full text-left">
-                            <thead class="bg-gray-700 text-gray-300">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-xl font-semibold mb-4 text-stone-800">Cálculo de Necesidades Energéticas</h3>
+                    <p class="mb-4 text-stone-600">Para un atleta de 90kg y 1.72m (asumiendo 30 años), calculamos el Gasto Energético Diario Total (TDEE) y luego aplicamos un déficit conservador.</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-stone-100">
                                 <tr>
-                                    <th class="p-3">Tipo de Día</th><th class="p-3">Calorías</th><th class="p-3">Proteínas</th><th class="p-3">Grasas</th><th class="p-3">Carbs</th>
+                                    <th class="p-3 font-semibold text-sm">Parámetro</th>
+                                    <th class="p-3 font-semibold text-sm">Cálculo / Justificación</th>
+                                    <th class="p-3 font-semibold text-sm text-right">Resultado</th>
                                 </tr>
                             </thead>
-                            <tbody id="nutrition-table-body" class="divide-y divide-gray-700"></tbody>
+                            <tbody>
+                                <tr class="border-b border-stone-200">
+                                    <td class="p-3 font-medium">Tasa Metabólica Basal (TMB)</td>
+                                    <td class="p-3 text-sm text-stone-600">Fórmula Mifflin-St Jeor: 10 * 90kg + 6.25 * 172cm - 5 * 30 + 5</td>
+                                    <td class="p-3 font-bold text-right">1830 kcal</td>
+                                </tr>
+                                <tr class="border-b border-stone-200">
+                                    <td class="p-3 font-medium">Gasto Energético Total (TDEE)</td>
+                                    <td class="p-3 text-sm text-stone-600">TMB * 1.55 (Factor de Actividad Moderada)</td>
+                                    <td class="p-3 font-bold text-right">2837 kcal</td>
+                                </tr>
+                                <tr class="bg-teal-50">
+                                    <td class="p-3 font-medium text-teal-800">Objetivo Calórico Final</td>
+                                    <td class="p-3 text-sm text-teal-700">TDEE - 300 kcal (Déficit conservador)</td>
+                                    <td class="p-3 font-bold text-teal-600 text-right text-lg">~2550 kcal</td>
+                                </tr>
+                            </tbody>
                         </table>
                     </div>
+                     <h3 class="text-xl font-semibold mt-8 mb-4 text-stone-800">Distribución de Macronutrientes</h3>
+                     <p class="mb-4 text-stone-600">Con el objetivo calórico fijado, la distribución de macronutrientes se optimiza para la hipertrofia y la recuperación.</p>
+                     <ul class="space-y-4">
+                         <li class="flex items-start">
+                             <span class="text-teal-500 font-bold text-xl mr-3">✔</span>
+                             <div>
+                                 <h4 class="font-semibold">Proteínas (180g)</h4>
+                                 <p class="text-stone-600 text-sm">A 2.0 g/kg, es el pilar para la síntesis de proteínas musculares y la preservación de la masa magra en un déficit.</p>
+                             </div>
+                         </li>
+                         <li class="flex items-start">
+                             <span class="text-teal-500 font-bold text-xl mr-3">✔</span>
+                             <div>
+                                 <h4 class="font-semibold">Grasas (71g)</h4>
+                                 <p class="text-stone-600 text-sm">~25% del total calórico. Esencial para la producción hormonal, incluida la testosterona, clave para el anabolismo.</p>
+                             </div>
+                         </li>
+                         <li class="flex items-start">
+                             <span class="text-teal-500 font-bold text-xl mr-3">✔</span>
+                             <div>
+                                 <h4 class="font-semibold">Carbohidratos (298g)</h4>
+                                 <p class="text-stone-600 text-sm">El resto de las calorías. Son el combustible principal para entrenamientos de alta intensidad y para reponer el glucógeno muscular.</p>
+                             </div>
+                         </li>
+                     </ul>
                 </div>
             </section>
 
-            <section id="cardio" class="content-section">
-                 <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
-                    <h2 class="text-2xl font-bold mb-4"><i class="ph-heartbeat text-indigo-400 mr-3"></i>Estrategia Cardiovascular</h2>
-                    <p class="text-gray-400 mb-6">Acelera la pérdida de grasa sin interferir con la recuperación y las ganancias musculares.</p>
-                     <div class="grid md:grid-cols-2 gap-6">
-                         <div class="bg-gray-700 p-5 rounded-lg">
-                             <h3 class="font-bold text-lg mb-2 text-white">HIIT</h3>
-                             <p class="text-gray-300"><strong class="text-indigo-400">Cuándo:</strong> 2 sesiones/semana (post-torso).</p>
-                             <p class="text-gray-300"><strong class="text-indigo-400">Duración:</strong> 15-20 min.</p>
-                         </div>
-                         <div class="bg-gray-700 p-5 rounded-lg">
-                             <h3 class="font-bold text-lg mb-2 text-white">LISS</h3>
-                             <p class="text-gray-300"><strong class="text-indigo-400">Cuándo:</strong> 2-3 sesiones/semana (días de descanso o post-pierna).</p>
-                             <p class="text-gray-300"><strong class="text-indigo-400">Duración:</strong> 30-45 min.</p>
-                         </div>
-                     </div>
-                    <h3 class="text-xl font-bold mt-8 mb-4">Calendario Semanal Integrado</h3>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left" id="cardio-schedule-table"></table>
+            <!-- Routine Page -->
+            <section id="routine" class="page">
+                 <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-teal-700 mb-2">Rutina de Entrenamiento Semanal</h2>
+                    <p class="text-stone-600 max-w-3xl mx-auto">Aquí está el plan de batalla. Selecciona un día para ver los ejercicios, series, repeticiones y descansos específicos. Cada sesión está diseñada para maximizar el estímulo de hipertrofia en los músculos objetivo.</p>
+                </div>
+                <div id="routine-nav" class="flex flex-wrap justify-center gap-2 mb-6">
+                    <button data-day="day1" class="day-btn active px-4 py-2 text-sm font-medium rounded-md bg-white shadow-sm hover:bg-stone-100 transition-colors">Día 1</button>
+                    <button data-day="day2" class="day-btn px-4 py-2 text-sm font-medium rounded-md bg-white shadow-sm hover:bg-stone-100 transition-colors">Día 2</button>
+                    <button data-day="day3" class="day-btn px-4 py-2 text-sm font-medium rounded-md bg-white shadow-sm hover:bg-stone-100 transition-colors">Día 3</button>
+                    <button data-day="day4" class="day-btn px-4 py-2 text-sm font-medium rounded-md bg-white shadow-sm hover:bg-stone-100 transition-colors">Día 4</button>
+                    <button data-day="day5" class="day-btn px-4 py-2 text-sm font-medium rounded-md bg-white shadow-sm hover:bg-stone-100 transition-colors">Día 5</button>
+                </div>
+
+                <div id="workouts-container">
+                    <!-- Day 1 Content -->
+                    <div id="day1" class="workout-day active"></div>
+                    <!-- Day 2 Content -->
+                    <div id="day2" class="workout-day"></div>
+                    <!-- Day 3 Content -->
+                    <div id="day3" class="workout-day"></div>
+                    <!-- Day 4 Content -->
+                    <div id="day4" class="workout-day"></div>
+                    <!-- Day 5 Content -->
+                    <div id="day5" class="workout-day"></div>
+                </div>
+            </section>
+
+            <!-- Cardio & Progression Page -->
+            <section id="cardio-progression" class="page">
+                 <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-teal-700 mb-2">Cardio y Progresión a Largo Plazo</h2>
+                    <p class="text-stone-600 max-w-3xl mx-auto">El levantamiento de pesas construye el músculo, mientras que el cardio estratégico ayuda a revelar tu trabajo. Aquí detallamos cómo integrar el cardio de forma inteligente y cómo planificar tu progreso para evitar estancamientos.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h3 class="text-xl font-semibold mb-3 text-stone-800">Protocolo LISS</h3>
+                        <p class="text-sm text-stone-600 mb-4">El Cardio de Baja Intensidad y Estado Estable (LISS) es tu herramienta para quemar grasa con un bajo impacto y mínimo estrés, facilitando la recuperación.</p>
+                        <ul class="text-sm space-y-2">
+                            <li><span class="font-semibold">Cuándo:</span> Días 2 y 4 (post-entreno)</li>
+                            <li><span class="font-semibold">Duración:</span> 30-40 minutos</li>
+                            <li><span class="font-semibold">Intensidad:</span> 50-65% Frecuencia Cardíaca Máx. (puedes mantener una conversación)</li>
+                            <li><span class="font-semibold">Modalidades:</span> Caminadora inclinada, elíptica, bicicleta estática.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h3 class="text-xl font-semibold mb-3 text-stone-800">Protocolo HIIT</h3>
+                        <p class="text-sm text-stone-600 mb-4">El Entrenamiento de Intervalos de Alta Intensidad (HIIT) es una bomba metabólica para maximizar la quema de calorías en poco tiempo.</p>
+                        <ul class="text-sm space-y-2">
+                            <li><span class="font-semibold">Cuándo:</span> Día 5 (post-entreno)</li>
+                            <li><span class="font-semibold">Duración:</span> 20 minutos</li>
+                            <li><span class="font-semibold">Protocolo:</span> 8 seg. sprint (>85% FCM) + 12 seg. recuperación activa. Repetir.</li>
+                            <li><span class="font-semibold">Beneficio:</span> Aumenta el metabolismo durante horas post-ejercicio (efecto EPOC).</li>
+                        </ul>
                     </div>
                 </div>
-            </section>
-        </main>
-    </div>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // --- DATA ---
-        const workoutData = {
-            lunes: { title: "Torso A: Énfasis Press y Hombro", dayType: "medio", exercises: [ { name: "Press de Banca con Barra", sets: "4x5-8", rest: "120-180s", rir: "2", notes: "Pilar para fuerza y masa." },{ name: "Superserie: Remo con Mancuerna / Press Inclinado con Mancuernas", sets: "4x8-12", rest: "60-90s", rir: "1-2", notes: "Superset antagonista." },{ name: "Elevaciones Laterales con Mancuerna", sets: "3x12-15", rest: "60s", rir: "1", notes: "Clave para anchura de hombros." },{ name: "Extensiones de Tríceps sobre la cabeza (cable)", sets: "3x10-15", rest: "60s", rir: "0-1", notes: "Estira y trabaja la cabeza larga." },{ name: "Face Pulls", sets: "3x15-20", rest: "60s", rir: "2", notes: "Esencial para salud del hombro." }] },
-            martes: { title: "Pierna A: Énfasis Sentadilla y Cuádriceps", dayType: "alto", exercises: [ { name: "Sentadilla con Barra (Trasera)", sets: "4x6-10", rest: "180s", rir: "2", notes: "Base de fuerza y masa." },{ name: "Prensa de Piernas", sets: "3x10-15", rest: "90s", rir: "1", notes: "Añadir volumen a cuádriceps." },{ name: "Zancadas Búlgaras con Mancuernas", sets: "3x8-12 (c/p)", rest: "90s", rir: "1", notes: "Trabajo unilateral." },{ name: "Extensiones de Cuádriceps", sets: "3x12-20", rest: "60s", rir: "0-1", notes: "Aislamiento para bombeo." },{ name: "Elevación de Talones de Pie", sets: "4x10-15", rest: "60s", rir: "1", notes: "Rango completo." }] },
-            miercoles: { title: "Torso B: Énfasis Tracción y Espalda", dayType: "medio", exercises: [ { name: "Dominadas con Lastre (o Jalón al Pecho)", sets: "4x6-10", rest: "120s", rir: "2", notes: "Constructor de anchura." },{ name: "Remo con Barra (Pendlay)", sets: "4x8-10", rest: "120s", rir: "2", notes: "Grosor de espalda." },{ name: "Superserie: Press Militar con Mancuernas (sentado) / Pullover con Mancuerna", sets: "3x10-12 / 3x12-15", rest: "75s", rir: "1-2", notes: "Desarrollo de hombros." },{ name: "Curl de Bíceps con Barra EZ", sets: "4x8-12", rest: "75s", rir: "1", notes: "Masa de bíceps." },{ name: "Curl Martillo con Mancuerna", sets: "3x10-15", rest: "60s", rir: "1", notes: "Trabaja el braquial." }] },
-            jueves: { title: "Pierna B: Énfasis Cadera e Isquios", dayType: "alto", exercises: [ { name: "Peso Muerto Rumano con Barra", sets: "4x8-12", rest: "120s", rir: "2", notes: "Clave para isquios/glúteos." },{ name: "Hip Thrust con Barra", sets: "4x8-12", rest: "120s", rir: "1", notes: "Desarrollo de glúteos." },{ name: "Curl Femoral Tumbado", sets: "3x12-15", rest: "75s", rir: "0-1", notes: "Aislamiento para isquios." },{ name: "Prensa de Gemelos en Máquina de Prensa", sets: "4x15-20", rest: "60s", rir: "1", notes: "Rango alto." },{ name: "Elevaciones de piernas colgado", sets: "3xAMRAP", rest: "60s", rir: "1", notes: "Abdominales inferiores." }] },
-            viernes: { title: "Torso C: Énfasis Brazos y Puntos Débiles", dayType: "medio", exercises: [ { name: "Press Francés (Skullcrushers)", sets: "4x10-15", rest: "75s", rir: "1", notes: "Masa de tríceps." },{ name: "Curl de Bíceps en Banco Scott", sets: "4x10-15", rest: "75s", rir: "1", notes: "Aísla el pico del bíceps." },{ name: "Superserie: Pushdown de Tríceps / Curl de Bíceps con Cable", sets: "3x12-20", rest: "60s", rir: "0-1", notes: "Bombeo y tensión." },{ name: "Elevaciones Laterales con Cable", sets: "4x15-20", rest: "60s", rir: "0-1", notes: "Tensión constante para look 3D." },{ name: "Pájaros (Bent-Over Dumbbell Raise)", sets: "3x15-20", rest: "60s", rir: "1", notes: "Aislamiento deltoides posterior." }] },
-            sabado: { title: "Descanso Activo", dayType: "bajo", exercises: [] },
-            domingo: { title: "Descanso Total", dayType: "bajo", exercises: [] }
-        };
-        const nutritionData = {
-            alto: { name: "Día Carbos Altos (Pierna)", calories: 3220, protein: 198, fat: 89, carbs: 405 },
-            medio: { name: "Día Carbos Medios (Torso)", calories: 3020, protein: 198, fat: 84, carbs: 365 },
-            bajo: { name: "Día Carbos Bajos (Descanso)", calories: 2520, protein: 198, fat: 70, carbs: 273 }
-        };
-        const cardioSchedule = [ { day: "Lunes", workout: "Torso A", cardio: "20 min HIIT", nutrition: "Medios" }, { day: "Martes", workout: "Pierna A", cardio: "Opcional LISS", nutrition: "Altos" }, { day: "Miércoles", workout: "Torso B", cardio: "20 min HIIT", nutrition: "Medios" }, { day: "Jueves", workout: "Pierna B", cardio: "Opcional LISS", nutrition: "Altos" }, { day: "Viernes", workout: "Torso C", cardio: "Ninguno", nutrition: "Medios" }, { day: "Sábado", workout: "Descanso", cardio: "30-45 min LISS", nutrition: "Bajos" }, { day: "Domingo", workout: "Descanso", cardio: "Opcional LISS", nutrition: "Bajos" }, ];
-
-        // --- UI Elements ---
-        const navItems = document.querySelectorAll('.nav-item');
-        const contentSections = document.querySelectorAll('.content-section');
-        
-        // --- Navigation ---
-        navItems.forEach(item => {
-            item.addEventListener('click', () => {
-                navItems.forEach(i => i.classList.remove('nav-active'));
-                item.classList.add('nav-active');
-                const targetId = item.getAttribute('data-target');
-                contentSections.forEach(section => {
-                    section.classList.toggle('active', section.id === targetId);
-                });
-            });
-        });
-
-        // --- RENDER FUNCTIONS ---
-        function renderWorkoutPlan() {
-            const container = document.getElementById('workout-plan');
-            container.innerHTML = '';
-            ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'].forEach(day => {
-                const dayData = workoutData[day];
-                const dayCard = document.createElement('div');
-                dayCard.className = 'bg-gray-700 p-4 rounded-lg';
-                let contentHTML = `<h3 class="text-xl font-semibold text-white capitalize">${day} - ${dayData.title}</h3><div class="mt-4 space-y-3">`;
-                dayData.exercises.forEach(ex => {
-                    contentHTML += `
-                        <div class="bg-gray-800 p-3 rounded-md">
-                            <div>
-                                <p class="font-semibold text-lg">${ex.name}</p>
-                                <div class="flex flex-wrap text-sm text-gray-400 mt-1 gap-x-4 gap-y-1">
-                                    <span><strong>Series/Reps:</strong> ${ex.sets}</span><span><strong>Descanso:</strong> ${ex.rest}</span><span><strong>RIR:</strong> ${ex.rir}</span>
-                                </div>
-                                <p class="text-sm text-gray-300 mt-2 italic">Nota: ${ex.notes}</p>
+                <div>
+                    <h3 class="text-2xl font-semibold mb-4 text-center text-stone-700">Planificación a 12 Semanas: Periodización Ondulante</h3>
+                    <div class="relative flex flex-col sm:flex-row justify-between items-center space-y-8 sm:space-y-0 sm:space-x-4">
+                        <div class="absolute top-1/2 left-4 right-4 h-1 bg-stone-300 hidden sm:block -z-10"></div>
+                        <div class="w-full sm:w-1/3 text-center">
+                            <div class="bg-teal-100 border-2 border-teal-500 rounded-lg p-4 shadow-md">
+                                <p class="font-bold text-teal-800">Semanas 1-4</p>
+                                <p class="font-semibold mt-1">Acumulación</p>
+                                <p class="text-xs text-teal-700 mt-1">Alto volumen y estrés metabólico (8-20 reps).</p>
                             </div>
-                        </div>`;
-                });
-                contentHTML += `</div>`;
-                dayCard.innerHTML = contentHTML;
-                container.appendChild(dayCard);
-            });
-        }
-
-        function renderNutritionPlan() {
-            const tbody = document.getElementById('nutrition-table-body');
-            tbody.innerHTML = '';
-            Object.values(nutritionData).forEach(dayType => {
-                const row = document.createElement('tr');
-                row.className = 'hover:bg-gray-700';
-                row.innerHTML = `<td class="p-3 font-semibold">${dayType.name}</td><td class="p-3">${dayType.calories.toLocaleString()}</td><td class="p-3">${dayType.protein}g</td><td class="p-3">${dayType.fat}g</td><td class="p-3">${dayType.carbs}g</td>`;
-                tbody.appendChild(row);
-            });
-        }
-
-        function renderCardioSchedule() {
-            const table = document.getElementById('cardio-schedule-table');
-            let html = `<thead class="bg-gray-700 text-gray-300"><tr><th class="p-3">Día</th><th class="p-3">Actividad</th><th class="p-3">Cardio</th><th class="p-3">Nutrición</th></tr></thead><tbody class="divide-y divide-gray-700">`;
-            cardioSchedule.forEach(item => {
-                html += `<tr class="hover:bg-gray-700"><td class="p-3 font-semibold">${item.day}</td><td class="p-3">${item.workout}</td><td class="p-3">${item.cardio}</td><td class="p-3">${item.nutrition}</td></tr>`;
-            });
-            html += `</tbody>`;
-            table.innerHTML = html;
-        }
-
-        function renderToday() {
-            const dayIndex = new Date().getDay();
-            const dayNames = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
-            const currentDayKey = dayNames[dayIndex];
-            const dayData = workoutData[currentDayKey];
-            document.getElementById('today-title').textContent = dayData.title;
-            const workoutContent = document.getElementById('today-workout-content');
-            workoutContent.innerHTML = '';
-            if (dayData.exercises.length > 0) {
-                dayData.exercises.forEach(ex => {
-                    const exEl = document.createElement('div');
-                    exEl.className = 'bg-gray-700 p-3 rounded-md';
-                    exEl.innerHTML = `<p class="font-semibold text-white">${ex.name}</p><p class="text-sm text-gray-300">${ex.sets} | Descanso: ${ex.rest} | RIR: ${ex.rir}</p>`;
-                    workoutContent.appendChild(exEl);
-                });
-            } else {
-                workoutContent.innerHTML = `<p class="text-gray-300">Día de descanso. ¡Enfócate en la recuperación!</p>`;
-            }
-            const nutritionContent = document.getElementById('today-nutrition-content');
-            const nutritionInfo = nutritionData[dayData.dayType];
-            nutritionContent.innerHTML = `
-                <div><p class="text-sm text-gray-400">Calorías</p><p class="text-xl font-bold text-indigo-300">${nutritionInfo.calories.toLocaleString()}</p></div>
-                <div><p class="text-sm text-gray-400">Proteínas</p><p class="text-xl font-bold">${nutritionInfo.protein}g</p></div>
-                <div><p class="text-sm text-gray-400">Grasas</p><p class="text-xl font-bold">${nutritionInfo.fat}g</p></div>
-                <div><p class="text-sm text-gray-400">Carbs</p><p class="text-xl font-bold">${nutritionInfo.carbs}g</p></div>`;
-        }
-
-        // --- INITIALIZATION ---
-        renderWorkoutPlan();
-        renderNutritionPlan();
-        renderCardioSchedule();
-        renderToday();
-        setInterval(renderToday, 60000); // Actualiza la sección "Hoy" cada minuto
-    });
-    </script>
-</body>
-</html>
+                        </div>
+                         <div class="w-full sm:w-1/3 text-center">
+                            <div class="bg-teal-100 border-2 border-teal-500 rounded-lg p-4 shadow-md">
+                                <p class="font-bold text-teal-800">Semanas 5-8</p>
+                                <p class="font-semibold mt-1">Intensificación</p>
+                                <p class="text-xs text-teal-700 mt-1">Más inte
