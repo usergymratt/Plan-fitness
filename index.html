@@ -3,21 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plan Pro Daniel Ramírez - Final Edition</title>
+    <title>Plan Pro Daniel Ramírez - Edición IA Mejorada</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Minimalist Red & Black (Reverted Header) -->
-    <!-- Application Structure Plan: Se ha revertido el diseño de la cabecera a la versión sin logos, manteniendo el título de texto "Plan Pro Daniel Ramírez" como fue solicitado, para un look más minimalista. -->
-    <!-- Visualization & Content Choices: 1. Cabecera: (Meta: Estética/Branding) Se ha eliminado el SVG del logo y se ha reintroducido el H1 con el nombre del plan y un emoji, volviendo a un diseño más simple y directo. Justificación: Ajuste estético final para satisfacer la preferencia del usuario por un diseño sin logos. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         :root { --main-red: #dc2626; --dark-bg: #101010; --card-bg-opaque: #181818; --card-bg-translucent: rgba(24, 24, 24, 0.85); --text-light: #e5e5e5; --text-dark: #a3a3a3; }
         body { 
             font-family: 'Inter', sans-serif;
-            background-image: linear-gradient(rgba(16, 16, 16, 0.95), rgba(16, 16, 16, 0.95)), url('https://images.pexels.com/photos/4164763/pexels-photo-4164763.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');
+            background-image: linear-gradient(rgba(16, 16, 16, 0.7), rgba(16, 16, 16, 0.7)), url('https://images.pexels.com/photos/4164763/pexels-photo-4164763.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');
             background-size: cover;
             background-position: center center;
             background-attachment: fixed;
@@ -44,220 +41,344 @@
         .card:hover { border-color: var(--main-red); }
         .nav-link-mobile.active { border-top: 2px solid var(--main-red); color: var(--main-red); }
         .nav-link-mobile.active > span { color: var(--main-red); font-weight: 600; }
-        .form-input { background-color: #262626; border: 1px solid #404040; border-radius: 0.375rem; padding: 0.5rem 0.75rem; color: var(--text-light); placeholder-color: var(--text-dark); }
-        .form-input:focus { outline: none; ring: 2px; ring-color: var(--main-red); border-color: var(--main-red); }
-        .btn-primary { background-color: var(--main-red); color: white; font-weight: bold; padding: 0.5rem 1rem; border-radius: 0.375rem; transition: background-color 0.2s; }
+        .form-input, .form-textarea { background-color: #262626; border: 1px solid #404040; border-radius: 0.375rem; padding: 0.5rem 0.75rem; color: var(--text-light); width: 100%; }
+        .form-input::placeholder, .form-textarea::placeholder { color: var(--text-dark); }
+        .form-input:focus, .form-textarea:focus { outline: none; box-shadow: 0 0 0 2px var(--main-red); border-color: var(--main-red); }
+        .btn-primary { background-color: var(--main-red); color: white; font-weight: bold; padding: 0.5rem 1rem; border-radius: 0.375rem; transition: background-color 0.2s; cursor: pointer; text-align: center;}
         .btn-primary:hover { background-color: #b91c1c; }
+        .btn-primary:disabled { background-color: #7f1d1d; cursor: not-allowed; opacity: 0.7; }
+        .btn-secondary { background-color: #404040; color: white; padding: 0.25rem 0.5rem; border-radius: 0.375rem; transition: background-color 0.2s; cursor: pointer; font-size: 0.75rem; }
+        .btn-secondary:hover { background-color: #525252; }
+        .btn-secondary:disabled { background-color: #262626; cursor: not-allowed; opacity: 0.7; }
         .btn-danger { background-color: #991b1b; color: white; padding: 0.25rem 0.5rem; font-size: 0.75rem; border-radius: 0.25rem; }
         .btn-danger:hover { background-color: #7f1d1d; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--main-red); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .progress-bar-bg { background-color: #262626; border-radius: 0.375rem; overflow: hidden; }
+        .progress-bar { background-color: var(--main-red); height: 100%; transition: width 0.5s ease-in-out; }
+        .modal-overlay { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+        .modal-container { position: relative; margin: auto; top: 50%; transform: translateY(-50%); width: 90%; max-width: 500px; padding: 20px; background: var(--card-bg-opaque); border-radius: 0.75rem; border: 1px solid #262626; text-align: center; }
     </style>
 </head>
 <body class="antialiased">
-    <div class="min-h-screen">
-        <header class="bg-black/50 backdrop-blur-md shadow-lg sticky top-0 z-20">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"><div class="flex items-center justify-between h-16">
-                <div class="flex items-center"><span class="text-2xl font-bold" style="color: var(--main-red);">🔥</span><h1 class="ml-3 text-xl font-bold tracking-tight">Plan Pro Daniel Ramírez</h1></div>
-                <nav class="hidden md:flex space-x-2" id="main-nav"><a href="#" data-tab="resumen" class="nav-link active px-3 py-2 rounded-md text-sm font-medium">Resumen</a><a href="#" data-tab="nutricion" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Nutrición</a><a href="#" data-tab="entrenamiento" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Entrenamiento</a><a href="#" data-tab="progreso" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Progreso</a><a href="#" data-tab="recursos" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Recursos</a></nav>
-            </div></div>
-        </header>
-
-        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8"><div class="px-4 py-6 sm:px-0">
-            <section id="resumen" class="content-section active">
-                <div class="text-center mb-10"><h2 class="text-3xl font-bold tracking-tight sm:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-white to-red-400">Tu Panel de Control</h2><p class="mt-4 text-lg text-gray-400">Objetivos nutricionales para máxima definición.</p></div>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                    <div class="flex flex-col items-center"><div class="chart-container"><canvas id="macroChart"></canvas></div></div>
-                    <div class="space-y-6">
-                        <div class="card text-center"><h3 class="text-lg font-semibold text-gray-500">Calorías Totales</h3><p id="total-calorias" class="text-5xl font-bold text-white">2270</p><p class="text-sm text-gray-400">kcal/día</p></div>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <div class="card text-center"><h4 class="text-md font-semibold text-red-500">Proteínas</h4><p id="gramos-proteina" class="text-3xl font-bold">225g</p></div>
-                            <div class="card text-center"><h4 class="text-md font-semibold text-gray-300">Carbs</h4><p id="gramos-carbs" class="text-3xl font-bold">200g</p></div>
-                            <div class="card text-center"><h4 class="text-md font-semibold text-gray-500">Grasas</h4><p id="gramos-grasas" class="text-3xl font-bold">63g</p></div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="nutricion" class="content-section">
-                 <div class="text-center mb-10"><h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Arquitectura Nutricional</h2><p class="mt-4 text-lg text-gray-400">Usa la matriz para personalizar tus comidas.</p></div>
-                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                     <div class="card"><h3 class="text-xl font-bold mb-4">Plan de Alimentación</h3><ul class="space-y-3 text-gray-300"><li><strong style="color: var(--main-red);">Comida 1:</strong> 5 claras + 1 huevo, 1/2 aguacate.</li><li><strong style="color: var(--main-red);">Comida 2:</strong> 200g yogur griego, frutos rojos.</li><li><strong style="color: var(--main-red);">Comida 3 (Pre):</strong> 200g pollo, 200g arroz, brócoli.</li><li><strong style="color: var(--main-red);">Comida 4 (Post):</strong> 40g whey. Luego: 180g lomo, 250g papa.</li><li><strong style="color: var(--main-red);">Comida 5:</strong> 200g cottage o 180g salmón, almendras.</li></ul></div>
-                     <div class="card"><h3 class="text-xl font-bold mb-4">Estrategia y Flexibilidad</h3><div class="space-y-4 text-gray-300"><p><strong style="color: var(--main-red);">Frecuencia:</strong> 4-6 comidas para optimizar MPS.</p><p><strong style="color: var(--main-red);">Timing de Carbs:</strong> Concentra carbs pre/post entreno.</p><p><strong style="color: var(--main-red);">Consistencia:</strong> Es la clave, mantén calorías y proteína estables.</p><p><strong style="color: var(--main-red);">Hidratación:</strong> Mínimo 3-4 litros de agua/día.</p></div></div>
-                 </div>
-                 <div class="card"><h3 class="text-xl font-bold mb-4 text-center">Matriz de Selección de Alimentos</h3><div class="overflow-x-auto"><table class="w-full text-sm text-left text-gray-400"><thead class="text-xs text-gray-300 uppercase bg-black/30"><tr><th class="px-6 py-3">Proteína</th><th class="px-6 py-3">Carbs</th><th class="px-6 py-3">Grasas</th><th class="px-6 py-3">Verduras/Frutas</th></tr></thead><tbody class="divide-y divide-gray-800"><tr><td class="px-6 py-4">Pechuga de pollo/pavo</td><td class="px-6 py-4">Avena, arroz</td><td class="px-6 py-4">Aguacate</td><td class="px-6 py-4">Brócoli, espinaca</td></tr><tr><td class="px-6 py-4">Lomo de res/cerdo</td><td class="px-6 py-4">Papa, batata, yuca</td><td class="px-6 py-4">Aceite de oliva</td><td class="px-6 py-4">Coliflor, pimentón</td></tr><tr><td class="px-6 py-4">Pescado blanco</td><td class="px-6 py-4">Plátano, pasta</td><td class="px-6 py-4">Nueces, almendras</td><td class="px-6 py-4">Cebolla, tomate</td></tr></tbody></table></div></div>
-            </section>
-            
-            <section id="entrenamiento" class="content-section">
-                <div class="text-center mb-10"><h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Protocolo de Entrenamiento</h2><p class="mt-4 text-lg text-gray-400">Enfoque en técnica, RIR y sobrecarga progresiva.</p></div>
-                <div class="flex justify-center flex-wrap gap-2 mb-8" id="workout-nav"><button data-day="1" class="workout-day-btn active px-4 py-2 text-sm font-bold rounded-md">Día 1</button><button data-day="2" class="workout-day-btn px-4 py-2 text-sm font-bold rounded-md">Día 2</button><button data-day="3" class="workout-day-btn px-4 py-2 text-sm font-bold rounded-md">Día 3</button><button data-day="4" class="workout-day-btn px-4 py-2 text-sm font-bold rounded-md">Día 4</button><button data-day="5" class="workout-day-btn px-4 py-2 text-sm font-bold rounded-md">Día 5</button></div>
-                <div id="workout-content" class="card"></div>
-            </section>
-            
-            <section id="progreso" class="content-section">
-                <div class="text-center mb-10"><h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Tu Centro de Progreso</h2><p class="mt-4 text-lg text-gray-400">Registra tus métricas, notas y levantamientos. La data es poder.</p></div>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="card space-y-4"><h3 class="text-xl font-bold text-center text-red-500">Registro de Medidas</h3>
-                        <form id="measurement-form" class="grid grid-cols-2 gap-4"><input type="date" id="measure-date" class="form-input col-span-2"><input type="number" step="0.1" id="measure-weight" placeholder="Peso (kg)" class="form-input"><input type="number" step="0.1" id="measure-waist" placeholder="Cintura (cm)" class="form-input"><input type="number" step="0.1" id="measure-chest" placeholder="Pecho (cm)" class="form-input"><input type="number" step="0.1" id="measure-arm" placeholder="Brazo (cm)" class="form-input"><button type="submit" class="btn-primary col-span-2">Guardar Medidas</button></form>
-                        <div class="overflow-auto max-h-60"><table class="w-full text-sm text-left"><thead class="text-xs text-red-400 uppercase bg-black/30"><tr><th class="p-2">Fecha</th><th class="p-2">Peso</th><th class="p-2">Cintura</th><th class="p-2"></th></tr></thead><tbody id="measurements-history" class="divide-y divide-gray-800"></tbody></table></div>
-                    </div>
-                    <div class="card space-y-4"><h3 class="text-xl font-bold text-center text-red-500">Bitácora de Notas</h3>
-                        <form id="notes-form" class="space-y-4"><textarea id="note-text" rows="4" class="form-input w-full" placeholder="Anota tus victorias, sensaciones, ajustes..."></textarea><button type="submit" class="btn-primary w-full">Guardar Nota</button></form>
-                        <div id="notes-history" class="space-y-3 overflow-auto max-h-60 pr-2"></div>
-                    </div>
-                    <div class="card lg:col-span-2 space-y-4"><h3 class="text-xl font-bold text-center text-red-500">Registro de Levantamientos</h3>
-                        <form id="lift-form" class="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
-                            <div class="sm:col-span-2"><label for="lift-exercise" class="text-xs text-gray-400">Ejercicio</label><select id="lift-exercise" class="form-input w-full"></select></div>
-                            <div><label for="lift-weight" class="text-xs text-gray-400">Peso (kg)</label><input type="number" step="0.5" id="lift-weight" placeholder="kg" class="form-input w-full"></div>
-                            <div><label for="lift-reps" class="text-xs text-gray-400">Reps</label><input type="number" id="lift-reps" placeholder="Reps" class="form-input w-full"></div>
-                            <button type="submit" class="btn-primary sm:col-span-4 w-full">Guardar Levantamiento</button>
-                        </form>
-                        <div class="flex justify-between items-center"><h4 class="text-lg font-semibold">Historial</h4><select id="lift-filter" class="form-input w-1/2 sm:w-1/3"></select></div>
-                        <div class="overflow-auto max-h-72"><table class="w-full text-sm text-left"><thead class="text-xs text-red-400 uppercase bg-black/30"><tr><th class="p-2">Fecha</th><th class="p-2">Ejercicio</th><th class="p-2">Peso</th><th class="p-2">Reps</th><th class="p-2"></th></tr></thead><tbody id="lifts-history" class="divide-y divide-gray-800"></tbody></table></div>
-                    </div>
-                </div>
-            </section>
-            
-            <section id="recursos" class="content-section">
-                <div class="text-center mb-10"><h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Caja de Herramientas</h2><p class="mt-4 text-lg text-gray-400">Conocimiento clave para potenciar tus resultados.</p></div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div class="card lg:col-span-3"><h3 class="text-2xl font-bold mb-4">Calculadoras de Entrenamiento</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div><h4 class="font-bold text-lg text-red-500 mb-2">Calculadora de 1RM Estimado</h4><form id="1rm-form" class="space-y-3"><input type="number" id="1rm-weight" placeholder="Peso levantado (kg)" class="form-input w-full"><input type="number" id="1rm-reps" placeholder="Repeticiones completadas" class="form-input w-full"><button type="submit" class="btn-primary w-full">Calcular 1RM</button></form><p id="1rm-result" class="mt-3 font-bold text-center text-xl"></p></div>
-                        <div><h4 class="font-bold text-lg text-red-500 mb-2">Calculadora de Peso por RIR</h4><form id="rir-form" class="space-y-3"><input type="number" id="rir-1rm" placeholder="Tu 1RM estimado (kg)" class="form-input w-full"><input type="number" id="rir-reps" placeholder="Repeticiones objetivo" class="form-input w-full"><input type="number" id="rir-rir" placeholder="RIR deseado (0-3)" class="form-input w-full"><button type="submit" class="btn-primary w-full">Calcular Peso</button></form><p id="rir-result" class="mt-3 font-bold text-center text-xl"></p></div>
-                    </div></div>
-                    <div class="card"><h3 class="text-2xl font-bold mb-4">Fundamentales</h3><ul class="text-sm list-disc list-inside text-gray-300 space-y-2"><li><strong>Abdomen:</strong> Sobrecarga progresiva con Crunch en Polea y Elev. de Piernas Colgado.</li><li><strong>Antebrazo:</strong> Atacar con flexión/extensión de muñeca y trabajo de agarre.</li></ul></div>
-                    <div class="card"><h3 class="text-2xl font-bold mb-4">Ciencia</h3><ul class="text-sm list-disc list-inside text-gray-300 space-y-2"><li><strong>Déficit Calórico:</strong> Esencial para la oxidación de grasa.</li><li><strong>Proteína Elevada:</strong> Clave para la retención muscular.</li><li><strong>Sobrecarga Progresiva:</strong> El pilar del progreso.</li></ul></div>
-                    <div class="card"><h3 class="text-2xl font-bold mb-4">Mindset</h3><ul class="text-sm list-disc list-inside text-gray-300 space-y-2"><li><strong>Consistencia > Perfección.</strong></li><li><strong>Paciencia y objetividad.</strong></li><li><strong>Conexión Mente-Músculo.</strong></li></ul></div>
-                </div>
-            </section>
-        </div></main>
-
-        <div class="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-md shadow-[0_-2px_10px_rgba(0,0,0,0.5)] md:hidden h-16">
-            <nav class="flex justify-around items-center h-full" id="mobile-nav"><a href="#" data-tab="resumen" class="nav-link-mobile active flex flex-col items-center text-xs p-1 text-gray-400">📊<span class="mt-1">Resumen</span></a><a href="#" data-tab="nutricion" class="nav-link-mobile flex flex-col items-center text-xs p-1 text-gray-400">🍎<span class="mt-1">Nutrición</span></a><a href="#" data-tab="entrenamiento" class="nav-link-mobile flex flex-col items-center text-xs p-1 text-gray-400">🏋️<span class="mt-1">Entreno</span></a><a href="#" data-tab="progreso" class="nav-link-mobile flex flex-col items-center text-xs p-1 text-gray-400">📈<span class="mt-1">Progreso</span></a><a href="#" data-tab="recursos" class="nav-link-mobile flex flex-col items-center text-xs p-1 text-gray-400">🧠<span class="mt-1">Recursos</span></a></nav>
+    <!-- Modal para el escáner de código de barras -->
+    <div id="barcode-scanner-modal" class="modal-overlay">
+        <div class="modal-container">
+            <h3 class="text-xl font-bold text-center text-white mb-4">Apunta al código de barras</h3>
+            <video id="video-scanner" class="w-full h-auto rounded-lg"></video>
+            <button id="close-scanner-btn" class="btn-primary w-full mt-4">Cancelar</button>
+        </div>
+    </div>
+    
+    <!-- Modal genérico para contenido de IA -->
+    <div id="ai-modal" class="modal-overlay">
+        <div class="modal-container max-w-2xl">
+            <div class="flex justify-between items-center pb-3 border-b border-gray-700">
+                <h3 id="ai-modal-title" class="text-xl font-bold text-white text-left"></h3>
+                <button id="ai-modal-close" class="text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
+            </div>
+            <div id="ai-modal-content-wrapper" class="p-4 overflow-y-auto max-h-[70vh] text-left">
+                 <div id="ai-modal-loader" class="hidden justify-center items-center p-12"><div class="loader"></div></div>
+                <div id="ai-modal-content"></div>
+            </div>
         </div>
     </div>
 
+    <!-- Modal para alertas y confirmaciones -->
+    <div id="alert-modal" class="modal-overlay">
+        <div class="modal-container">
+            <p id="alert-modal-message" class="text-white mb-6"></p>
+            <div id="alert-modal-buttons" class="flex justify-center gap-4"></div>
+        </div>
+    </div>
+
+    <div class="min-h-screen pb-16 md:pb-0">
+        <header class="bg-black/50 backdrop-blur-md shadow-lg sticky top-0 z-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center">
+                        <span class="text-2xl font-bold" style="color: var(--main-red);">🔥</span>
+                        <h1 class="ml-3 text-xl font-bold tracking-tight">Plan Pro Daniel Ramírez</h1>
+                    </div>
+                    <nav class="hidden md:flex space-x-2" id="main-nav">
+                        <a href="#" data-tab="resumen" class="nav-link active px-3 py-2 rounded-md text-sm font-medium">Resumen</a>
+                        <a href="#" data-tab="fit-ai" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Fit-AI</a>
+                        <a href="#" data-tab="nutricion" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Nutrición</a>
+                        <a href="#" data-tab="entrenamiento" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Entrenamiento</a>
+                        <a href="#" data-tab="progreso" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Progreso</a>
+                        <a href="#" data-tab="recursos" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Recursos</a>
+                    </nav>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="px-4 py-6 sm:px-0">
+                <!-- SECCIÓN RESUMEN -->
+                <section id="resumen" class="content-section active">
+                    <div class="text-center mb-10"><h2 class="text-3xl font-bold tracking-tight sm:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-white to-red-400">Tu Panel de Control</h2><p class="mt-4 text-lg text-gray-400">Objetivos nutricionales para máxima definición.</p></div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                        <div class="flex flex-col items-center"><div class="chart-container"><canvas id="macroChart"></canvas></div></div>
+                        <div class="space-y-6">
+                            <div class="card text-center"><h3 class="text-lg font-semibold text-gray-500">Calorías Totales</h3><p id="total-calorias" class="text-5xl font-bold text-white">2270</p><p class="text-sm text-gray-400">kcal/día</p></div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div class="card text-center"><h4 class="text-md font-semibold text-red-500">Proteínas</h4><p id="gramos-proteina" class="text-3xl font-bold">225g</p></div>
+                                <div class="card text-center"><h4 class="text-md font-semibold text-gray-300">Carbs</h4><p id="gramos-carbs" class="text-3xl font-bold">200g</p></div>
+                                <div class="card text-center"><h4 class="text-md font-semibold text-gray-500">Grasas</h4><p id="gramos-grasas" class="text-3xl font-bold">63g</p></div>
+                            </div>
+                             <div class="card text-center">
+                                <button id="change-goal-ai-btn" class="btn-primary w-full">✨ Ajustar Objetivo con IA</button>
+                             </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECCIÓN FIT-AI -->
+                <section id="fit-ai" class="content-section">
+                    <div class="text-center mb-10">
+                        <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">🤖 Tu Asistente Nutricional</h2>
+                        <p class="mt-4 text-lg text-gray-400">Usa IA para generar recetas, analizar comidas y planificar tu día.</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                         <div class="card space-y-4">
+                            <h3 class="text-xl font-bold text-center text-red-500">✨ Buscar Receta</h3>
+                            <form id="recipe-search-form" class="flex gap-2">
+                                <input type="search" id="recipe-search-input" placeholder="Ej: Omelette de espinacas..." class="form-input w-full">
+                                <button type="submit" class="btn-primary">🔎</button>
+                            </form>
+                            <p class="text-xs text-center text-gray-500">La IA generará una receta y sus macros.</p>
+                        </div>
+                        <div class="card space-y-4 flex flex-col justify-center items-center text-center">
+                            <h3 class="text-xl font-bold text-red-500">Escanear Producto</h3>
+                            <p class="text-sm text-gray-400 flex-grow">Usa tu cámara para obtener la información nutricional de un producto al instante.</p>
+                            <button id="scan-barcode-btn" class="btn-primary w-full mt-4">📷 Escanear</button>
+                        </div>
+                        <div class="card space-y-4">
+                            <h3 class="text-xl font-bold text-center text-red-500">✨ Analizar Comida</h3>
+                            <input type="file" id="food-image-input" accept="image/*" class="form-input w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-900 file:text-red-100 hover:file:bg-red-800">
+                            <button id="analyze-image-btn" class="btn-primary w-full">🖼️ Analizar Imagen</button>
+                            <img id="image-preview" src="" class="hidden w-full max-w-xs mx-auto rounded-lg mt-4"/>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8">
+                        <div class="card text-center">
+                            <h3 class="text-xl font-bold text-red-500">✨ Tu Plan de Comidas Diario</h3>
+                            <p class="text-sm text-gray-400 my-4">Genera un plan de comidas completo para todo el día que se ajuste perfectly a tus macros objetivos. Puedes especificar tus preferencias.</p>
+                            <form id="meal-plan-form" class="flex flex-col sm:flex-row gap-2 justify-center">
+                                 <input type="text" id="meal-plan-prefs" class="form-input flex-grow" placeholder="Preferencias (ej: vegetariano, sin lácteos)">
+                                 <button type="submit" id="generate-meal-plan-btn" class="btn-primary">Generar Plan</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+                        <div class="card space-y-4">
+                            <h3 class="text-xl font-bold text-center">Resultado del Análisis</h3>
+                            <div id="ai-result-loader" class="hidden justify-center items-center py-8"><div class="loader"></div></div>
+                            <div id="ai-result-content" class="text-center text-gray-400">Selecciona una herramienta para empezar.</div>
+                        </div>
+                        <div class="card space-y-4">
+                            <h3 class="text-xl font-bold text-center">Tu Consumo de Hoy</h3>
+                            <div id="daily-log-progress"></div>
+                            <div class="flex justify-between items-center">
+                                <h4 class="text-lg font-semibold">Comidas Registradas</h4>
+                                <button id="clear-log-btn" class="btn-danger">Limpiar</button>
+                            </div>
+                            <div id="daily-log-history" class="space-y-3 overflow-auto max-h-60 pr-2"></div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- SECCIÓN NUTRICIÓN -->
+                <section id="nutricion" class="content-section">
+                   <div class="text-center mb-10"><h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Arquitectura Nutricional</h2><p class="mt-4 text-lg text-gray-400">Usa la matriz para personalizar tus comidas.</p></div>
+                   <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                       <div class="card"><h3 class="text-xl font-bold mb-4">Plan de Alimentación</h3><ul class="space-y-3 text-gray-300"><li><strong style="color: var(--main-red);">Comida 1:</strong> 5 claras + 1 huevo, 1/2 aguacate.</li><li><strong style="color: var(--main-red);">Comida 2:</strong> 200g yogur griego, frutos rojos.</li><li><strong style="color: var(--main-red);">Comida 3 (Pre):</strong> 200g pollo, 200g arroz, brócoli.</li><li><strong style="color: var(--main-red);">Comida 4 (Post):</strong> 40g whey. Luego: 180g lomo, 250g papa.</li><li><strong style="color: var(--main-red);">Comida 5:</strong> 200g cottage o 180g salmón, almendras.</li></ul></div>
+                       <div class="card"><h3 class="text-xl font-bold mb-4">Estrategia y Flexibilidad</h3><div class="space-y-4 text-gray-300"><p><strong style="color: var(--main-red);">Frecuencia:</strong> 4-6 comidas para optimizar MPS.</p><p><strong style="color: var(--main-red);">Timing de Carbs:</strong> Concentra carbs pre/post entreno.</p><p><strong style="color: var(--main-red);">Consistencia:</strong> Es la clave, mantén calorías y proteína estables.</p><p><strong style="color: var(--main-red);">Hidratación:</strong> Mínimo 3-4 litros de agua/día.</p></div></div>
+                   </div>
+                   <div class="card"><h3 class="text-xl font-bold mb-4 text-center">Matriz de Selección de Alimentos</h3><div class="overflow-x-auto"><table class="w-full text-sm text-left text-gray-400"><thead class="text-xs text-gray-300 uppercase bg-black/30"><tr><th class="px-6 py-3">Proteína</th><th class="px-6 py-3">Carbs</th><th class="px-6 py-3">Grasas</th><th class="px-6 py-3">Verduras/Frutas</th></tr></thead><tbody class="divide-y divide-gray-800"><tr><td class="px-6 py-4">Pechuga de pollo/pavo</td><td class="px-6 py-4">Avena, arroz</td><td class="px-6 py-4">Aguacate</td><td class="px-6 py-4">Brócoli, espinaca</td></tr><tr><td class="px-6 py-4">Lomo de res/cerdo</td><td class="px-6 py-4">Papa, batata, yuca</td><td class="px-6 py-4">Aceite de oliva</td><td class="px-6 py-4">Coliflor, pimentón</td></tr><tr><td class="px-6 py-4">Pescado blanco</td><td class="px-6 py-4">Plátano, pasta</td><td class="px-6 py-4">Nueces, almendras</td><td class="px-6 py-4">Cebolla, tomate</td></tr></tbody></table></div></div>
+                </section>
+                
+                <!-- SECCIÓN ENTRENAMIENTO -->
+                <section id="entrenamiento" class="content-section">
+                    <div class="text-center mb-10">
+                        <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Protocolo de Entrenamiento</h2>
+                        <p class="mt-4 text-lg text-gray-400">Enfoque en técnica, RIR y sobrecarga progresiva.</p>
+                        <div class="mt-6">
+                           <button id="modify-workout-ai-btn" class="btn-primary text-lg py-3 px-6">🦾 Modificar Rutina con IA</button>
+                        </div>
+                    </div>
+                    <div class="flex justify-center flex-wrap gap-2 mb-8" id="workout-nav"><button data-day="1" class="workout-day-btn active px-4 py-2 text-sm font-bold rounded-md">Día 1</button><button data-day="2" class="workout-day-btn px-4 py-2 text-sm font-bold rounded-md">Día 2</button><button data-day="3" class="workout-day-btn px-4 py-2 text-sm font-bold rounded-md">Día 3</button><button data-day="4" class="workout-day-btn px-4 py-2 text-sm font-bold rounded-md">Día 4</button><button data-day="5" class="workout-day-btn px-4 py-2 text-sm font-bold rounded-md">Día 5</button></div>
+                    <div id="workout-content" class="card"></div>
+                </section>
+                
+                <!-- SECCIÓN PROGRESO -->
+                <section id="progreso" class="content-section">
+                        <div class="text-center mb-10">
+                            <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Tu Centro de Progreso</h2>
+                            <p class="mt-4 text-lg text-gray-400">Registra tus métricas, notas y levantamientos. La data es poder.</p>
+                            <div class="mt-6">
+                                <button id="analyze-progress-btn" class="btn-primary text-lg py-3 px-6">✨ ¡Analiza Mi Progreso con IA!</button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                <div class="card space-y-4"><h3 class="text-xl font-bold text-center text-red-500">Registro de Medidas</h3>
+                                    <form id="measurement-form" class="grid grid-cols-2 gap-4"><input type="date" id="measure-date" class="form-input col-span-2"><input type="number" step="0.1" id="measure-weight" placeholder="Peso (kg)" class="form-input"><input type="number" step="0.1" id="measure-waist" placeholder="Cintura (cm)" class="form-input"><input type="number" step="0.1" id="measure-chest" placeholder="Pecho (cm)" class="form-input"><input type="number" step="0.1" id="measure-arm" placeholder="Brazo (cm)" class="form-input"><button type="submit" class="btn-primary col-span-2">Guardar Medidas</button></form>
+                                    <div class="overflow-auto max-h-60"><table class="w-full text-sm text-left"><thead class="text-xs text-red-400 uppercase bg-black/30"><tr><th class="p-2">Fecha</th><th class="p-2">Peso</th><th class="p-2">Cintura</th><th class="p-2">Pecho</th><th class="p-2">Brazo</th><th class="p-2"></th></tr></thead><tbody id="measurements-history" class="divide-y divide-gray-800"></tbody></table></div>
+                                </div>
+                                <div class="card space-y-4"><h3 class="text-xl font-bold text-center text-red-500">Bitácora de Notas</h3>
+                                    <form id="notes-form" class="space-y-4"><textarea id="note-text" rows="4" class="form-textarea" placeholder="Anota tus victorias, sensaciones, ajustes..."></textarea><button type="submit" class="btn-primary w-full">Guardar Nota</button></form>
+                                    <div id="notes-history" class="space-y-3 overflow-auto max-h-60 pr-2"></div>
+                                </div>
+                                <div class="card lg:col-span-2 space-y-4"><h3 class="text-xl font-bold text-center text-red-500">Registro de Levantamientos</h3>
+                                    <form id="lift-form" class="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
+                                        <div class="sm:col-span-2"><label for="lift-exercise" class="text-xs text-gray-400">Ejercicio</label><select id="lift-exercise" class="form-input w-full"></select></div>
+                                        <div><label for="lift-weight" class="text-xs text-gray-400">Peso (kg)</label><input type="number" step="0.5" id="lift-weight" placeholder="kg" class="form-input w-full"></div>
+                                        <div><label for="lift-reps" class="text-xs text-gray-400">Reps</label><input type="number" id="lift-reps" placeholder="Reps" class="form-input w-full"></div>
+                                        <button type="submit" class="btn-primary sm:col-span-4 w-full">Guardar Levantamiento</button>
+                                    </form>
+                                    <div class="flex justify-between items-center"><h4 class="text-lg font-semibold">Historial</h4><select id="lift-filter" class="form-input w-1/2 sm:w-1/3"></select></div>
+                                    <div class="overflow-auto max-h-72"><table class="w-full text-sm text-left"><thead class="text-xs text-red-400 uppercase bg-black/30"><tr><th class="p-2">Fecha</th><th class="p-2">Ejercicio</th><th class="p-2">Peso</th><th class="p-2">Reps</th><th class="p-2"></th></tr></thead><tbody id="lifts-history" class="divide-y divide-gray-800"></tbody></table></div>
+                                </div>
+                        </div>
+                </section>
+                
+                <!-- SECCIÓN RECURSOS -->
+                <section id="recursos" class="content-section">
+                    <div class="text-center mb-10"><h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Caja de Herramientas</h2><p class="mt-4 text-lg text-gray-400">Conocimiento clave para potenciar tus resultados.</p></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div class="card lg:col-span-3"><h3 class="text-2xl font-bold mb-4">Calculadoras de Entrenamiento</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div><h4 class="font-bold text-lg text-red-500 mb-2">Calculadora de 1RM Estimado</h4><form id="1rm-form" class="space-y-3"><input type="number" id="1rm-weight" placeholder="Peso levantado (kg)" class="form-input w-full"><input type="number" id="1rm-reps" placeholder="Repeticiones completadas" class="form-input w-full"><button type="submit" class="btn-primary w-full">Calcular 1RM</button></form><p id="1rm-result" class="mt-3 font-bold text-center text-xl"></p></div>
+                            <div><h4 class="font-bold text-lg text-red-500 mb-2">Calculadora de Peso por RIR</h4><form id="rir-form" class="space-y-3"><input type="number" id="rir-1rm" placeholder="Tu 1RM estimado (kg)" class="form-input w-full"><input type="number" id="rir-reps" placeholder="Repeticiones objetivo" class="form-input w-full"><input type="number" id="rir-rir" placeholder="RIR deseado (0-3)" class="form-input w-full"><button type="submit" class="btn-primary w-full">Calcular Peso</button></form><p id="rir-result" class="mt-3 font-bold text-center text-xl"></p></div>
+                        </div></div>
+                        <div class="card"><h3 class="text-2xl font-bold mb-4">Fundamentales</h3><ul class="text-sm list-disc list-inside text-gray-300 space-y-2"><li><strong>Abdomen:</strong> Sobrecarga progresiva con Crunch en Polea y Elev. de Piernas Colgado.</li><li><strong>Antebrazo:</strong> Atacar con flexión/extensión de muñeca y trabajo de agarre.</li></ul></div>
+                        <div class="card"><h3 class="text-2xl font-bold mb-4">Ciencia</h3><ul class="text-sm list-disc list-inside text-gray-300 space-y-2"><li><strong>Déficit Calórico:</strong> Esencial para la oxidación de grasa.</li><li><strong>Proteína Elevada:</strong> Clave para la retención muscular.</li><li><strong>Sobrecarga Progresiva:</strong> El pilar del progreso.</li></ul></div>
+                        <div class="card"><h3 class="text-2xl font-bold mb-4">Mindset</h3><ul class="text-sm list-disc list-inside text-gray-300 space-y-2"><li><strong>Consistencia > Perfección.</strong></li><li><strong>Paciencia y objetividad.</strong></li><li><strong>Conexión Mente-Músculo.</strong></li></ul></div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- NAVEGACIÓN MÓVIL -->
+        <div class="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-md shadow-[0_-2px_10px_rgba(0,0,0,0.5)] md:hidden h-16">
+            <nav class="flex justify-around items-center h-full" id="mobile-nav">
+                <a href="#" data-tab="resumen" class="nav-link-mobile active flex flex-col items-center text-xs p-1 text-gray-400">📊<span class="mt-1">Resumen</span></a>
+                <a href="#" data-tab="fit-ai" class="nav-link-mobile flex flex-col items-center text-xs p-1 text-gray-400">🤖<span class="mt-1">Fit-AI</span></a>
+                <a href="#" data-tab="nutricion" class="nav-link-mobile flex flex-col items-center text-xs p-1 text-gray-400">🍎<span class="mt-1">Nutrición</span></a>
+                <a href="#" data-tab="entrenamiento" class="nav-link-mobile flex flex-col items-center text-xs p-1 text-gray-400">🏋️<span class="mt-1">Entreno</span></a>
+                <a href="#" data-tab="progreso" class="nav-link-mobile flex flex-col items-center text-xs p-1 text-gray-400">📈<span class="mt-1">Progreso</span></a>
+                <a href="#" data-tab="recursos" class="nav-link-mobile flex flex-col items-center text-xs p-1 text-gray-400">🧠<span class="mt-1">Recursos</span></a>
+            </nav>
+        </div>
+    </div>
+    
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const macroData = { calorias: 2270, proteina: 225, carbs: 200, grasas: 63 };
-    // --- DATA DE ENTRENAMIENTO ACTUALIZADA ---
+    // --- DATOS Y CONFIGURACIÓN INICIAL ---
+    let macroData = { calorias: 2270, proteina: 225, carbs: 200, grasas: 63 };
     const workoutData = {
-        '1':{
-            title:'Día 1: Empuje (Pecho, Hombro, Tríceps)',
-            description:'Énfasis en fuerza e hipertrofia.',
-            main_work: [
-                {name:'Press de Banca con Barra',sets:4,reps:'6-10',rest:'180s',rir:'2'},
-                {name:'Press Inclinado con Mancuernas',sets:3,reps:'8-12',rest:'120s',rir:'1-2'},
-                {name:'Press Militar con Barra',sets:4,reps:'6-10',rest:'150s',rir:'2'},
-                {name:'Elevaciones Laterales',sets:4,reps:'12-15',rest:'75s',rir:'1'},
-                {name:'Fondos en Paralelas (o Máquina)',sets:3,reps:'Al fallo',rest:'90s',rir:'0'},
-                {name:'Extensiones de Tríceps en Polea',sets:3,reps:'12-15',rest:'75s',rir:'Drop set'}
-            ],
-            specific_work: [
-                {name:'Crunch en Polea Alta',sets:3,reps:'15-20',rest:'60s',rir:'1'},
-                {name:'Elevaciones de Piernas Colgado',sets:3,reps:'15-20',rest:'60s',rir:'1'}
-            ],
-            cardio: { name: 'CARDIO LISS', details: '30-45 minutos a ritmo constante (65-75% FC Máx).' }
-        },
-        '2':{
-            title:'Día 2: Tirón (Espalda, Bíceps)',
-            description:'Construcción de densidad y fuerza.',
-            main_work: [
-                {name:'Peso Muerto Rumano (RDL)',sets:4,reps:'6-10',rest:'180s',rir:'2'},
-                {name:'Remo con Barra',sets:4,reps:'6-10',rest:'150s',rir:'2'},
-                {name:'Remo con Mancuerna',sets:3,reps:'8-12 c/b',rest:'90s',rir:'1-2'},
-                {name:'Face Pulls',sets:4,reps:'15-20',rest:'75s',rir:'1'},
-                {name:'Curl con Barra Z',sets:3,reps:'8-12',rest:'90s',rir:'1-2'}
-            ],
-            specific_work: [
-                {name:'Curl Martillo',sets:3,reps:'10-15',rest:'75s',rir:'1'},
-                {name:'Curl de Muñeca (Flex/Ext)',sets:'3 c/u',reps:'15-20',rest:'60s',rir:'1'}
-            ]
-        },
-        '3':{
-            title:'Día 3: Piernas y Core',
-            description:'Enfoque en hipertrofia y estabilidad.',
-            main_work: [
-                {name:'Prensa de Piernas',sets:4,reps:'10-15',rest:'120s',rir:'1-2'},
-                {name:'Hip Thrust',sets:3,reps:'8-12',rest:'120s',rir:'1'},
-                {name:'Curl Femoral',sets:3,reps:'12-15',rest:'90s',rir:'1'},
-                {name:'Extensiones de Cuádriceps',sets:3,reps:'12-18',rest:'75s',rir:'1'},
-                {name:'Abducción de Cadera',sets:3,reps:'15-20',rest:'60s',rir:'1'},
-                {name:'Elevación de Gemelos',sets:4,reps:'15-20',rest:'60s',rir:'1'}
-            ],
-            specific_work: [
-                {name:'Plancha con Peso',sets:3,reps:'45-60s',rest:'60s',rir:'N/A'},
-                {name:'Plancha Lateral',sets:3,reps:'30-45s c/l',rest:'45s',rir:'N/A'}
-            ],
-            cardio: { name: 'CARDIO LISS', details: '30-45 minutos a ritmo constante (65-75% FC Máx).' }
-        },
-        '4':{
-            title:'Día 4: Espalda y Antebrazo',
-            description:'Alto volumen para amplitud y agarre.',
-            main_work: [
-                {name:'Jalón al Pecho',sets:4,reps:'8-12',rest:'120s',rir:'1-2'},
-                {name:'Remo en Polea Baja',sets:4,reps:'8-12',rest:'90s',rir:'1-2'},
-                {name:'Pullover con Cable',sets:3,reps:'12-15',rest:'75s',rir:'1'},
-                {name:'Pájaros (Hombro Posterior)',sets:3,reps:'15-20',rest:'75s',rir:'1'},
-                {name:'Curl Predicador',sets:3,reps:'8-12',rest:'90s',rir:'1'}
-            ],
-            specific_work: [
-                {name:'Paseo del Granjero',sets:3,reps:'30-40m',rest:'90s',rir:'N/A'},
-                {name:'Curl de Concentración',sets:3,reps:'10-15 c/b',rest:'60s',rir:'0-1'}
-            ]
-        },
-        '5':{
-            title:'Día 5: Empuje (Hipertrofia)',
-            description:'Énfasis en estrés metabólico y core avanzado.',
-            main_work: [
-                {name:'Press Inclinado con Barra',sets:4,reps:'8-12',rest:'120s',rir:'1-2'},
-                {name:'Press Hombros Mancuernas',sets:4,reps:'8-12',rest:'120s',rir:'1-2'},
-                {name:'Cruces en Polea',sets:3,reps:'12-15',rest:'75s',rir:'Drop set'},
-                {name:'Elev. Laterales Sentado',sets:4,reps:'15-20',rest:'75s',rir:'1'},
-                {name:'Ext. Tríceps sobre Cabeza',sets:3,reps:'10-15',rest:'75s',rir:'1'},
-                {name:'Press Francés',sets:3,reps:'10-12',rest:'90s',rir:'1'}
-            ],
-            specific_work: [
-                {name:'Rueda Abdominal',sets:3,reps:'Al fallo',rest:'75s',rir:'0'},
-                {name:'Rotaciones Rusas (Leñador)',sets:3,reps:'10-15 c/l',rest:'60s',rir:'1'}
-            ],
-            cardio: { name: 'CARDIO HIIT', details: '15-20 min. Ejemplo: 1 min sprint, 2 min recuperación. Repetir.' }
-        }
+        '1':{ title:'Día 1: Empuje (Pecho, Hombro, Tríceps)', description:'Énfasis en fuerza e hipertrofia.', main_work: [ {name:'Press de Banca con Barra',sets:4,reps:'6-10',rest:'180s',rir:'2'}, {name:'Press Inclinado con Mancuernas',sets:3,reps:'8-12',rest:'120s',rir:'1-2'}, {name:'Press Militar con Barra',sets:4,reps:'6-10',rest:'150s',rir:'2'}, {name:'Elevaciones Laterales',sets:4,reps:'12-15',rest:'75s',rir:'1'}, {name:'Fondos en Paralelas (o Máquina)',sets:3,reps:'Al fallo',rest:'90s',rir:'0'}, {name:'Extensiones de Tríceps en Polea',sets:3,reps:'12-15',rest:'75s',rir:'Drop set'} ], specific_work: [ {name:'Crunch en Polea Alta',sets:3,reps:'15-20',rest:'60s',rir:'1'}, {name:'Elevaciones de Piernas Colgado',sets:3,reps:'15-20',rest:'60s',rir:'1'} ], cardio: { name: 'CARDIO LISS', details: '30-45 minutos a ritmo constante (65-75% FC Máx).' } },
+        '2':{ title:'Día 2: Tirón (Espalda, Bíceps)', description:'Construcción de densidad y fuerza.', main_work: [ {name:'Peso Muerto Rumano (RDL)',sets:4,reps:'6-10',rest:'180s',rir:'2'}, {name:'Remo con Barra',sets:4,reps:'6-10',rest:'150s',rir:'2'}, {name:'Remo con Mancuerna',sets:3,reps:'8-12 c/b',rest:'90s',rir:'1-2'}, {name:'Face Pulls',sets:4,reps:'15-20',rest:'75s',rir:'1'}, {name:'Curl con Barra Z',sets:3,reps:'8-12',rest:'90s',rir:'1-2'} ], specific_work: [ {name:'Curl Martillo',sets:3,reps:'10-15',rest:'75s',rir:'1'}, {name:'Curl de Muñeca (Flex/Ext)',sets:'3 c/u',reps:'15-20',rest:'60s',rir:'1'} ] },
+        '3':{ title:'Día 3: Piernas y Core', description:'Enfoque en hipertrofia y estabilidad.', main_work: [ {name:'Prensa de Piernas',sets:4,reps:'10-15',rest:'120s',rir:'1-2'}, {name:'Hip Thrust',sets:3,reps:'8-12',rest:'120s',rir:'1'}, {name:'Curl Femoral',sets:3,reps:'12-15',rest:'90s',rir:'1'}, {name:'Extensiones de Cuádriceps',sets:3,reps:'12-18',rest:'75s',rir:'1'}, {name:'Abducción de Cadera',sets:3,reps:'15-20',rest:'60s',rir:'1'}, {name:'Elevación de Gemelos',sets:4,reps:'15-20',rest:'60s',rir:'1'} ], specific_work: [ {name:'Plancha con Peso',sets:3,reps:'45-60s',rest:'60s',rir:'N/A'}, {name:'Plancha Lateral',sets:3,reps:'30-45s c/l',rest:'45s',rir:'N/A'} ], cardio: { name: 'CARDIO LISS', details: '30-45 minutos a ritmo constante (65-75% FC Máx).' } },
+        '4':{ title:'Día 4: Espalda y Antebrazo', description:'Alto volumen para amplitud y agarre.', main_work: [ {name:'Jalón al Pecho',sets:4,reps:'8-12',rest:'120s',rir:'1-2'}, {name:'Remo en Polea Baja',sets:4,reps:'8-12',rest:'90s',rir:'1-2'}, {name:'Pullover con Cable',sets:3,reps:'12-15',rest:'75s',rir:'1'}, {name:'Pájaros (Hombro Posterior)',sets:3,reps:'15-20',rest:'75s',rir:'1'}, {name:'Curl Predicador',sets:3,reps:'8-12',rest:'90s',rir:'1'} ], specific_work: [ {name:'Paseo del Granjero',sets:3,reps:'30-40m',rest:'90s',rir:'N/A'}, {name:'Curl de Concentración',sets:3,reps:'10-15 c/b',rest:'60s',rir:'0-1'} ] },
+        '5':{ title:'Día 5: Empuje (Hipertrofia)', description:'Énfasis en estrés metabólico y core avanzado.', main_work: [ {name:'Press Inclinado con Barra',sets:4,reps:'8-12',rest:'120s',rir:'1-2'}, {name:'Press Hombros Mancuernas',sets:4,reps:'8-12',rest:'120s',rir:'1-2'}, {name:'Cruces en Polea',sets:3,reps:'12-15',rest:'75s',rir:'Drop set'}, {name:'Elev. Laterales Sentado',sets:4,reps:'15-20',rest:'75s',rir:'1'}, {name:'Ext. Tríceps sobre Cabeza',sets:3,reps:'10-15',rest:'75s',rir:'1'}, {name:'Press Francés',sets:3,reps:'10-12',rest:'90s',rir:'1'} ], specific_work: [ {name:'Rueda Abdominal',sets:3,reps:'Al fallo',rest:'75s',rir:'0'}, {name:'Rotaciones Rusas (Leñador)',sets:3,reps:'10-15 c/l',rest:'60s',rir:'1'} ], cardio: { name: 'CARDIO HIIT', details: '15-20 min. Ejemplo: 1 min sprint, 2 min recuperación. Repetir.' } }
     };
+    let activeWorkoutDay = '1'; 
+    let macroChartInstance;
     
-    new Chart(document.getElementById('macroChart').getContext('2d'), { type: 'doughnut', data: { labels: ['Proteína', 'Carbs', 'Grasas'], datasets: [{ data: [macroData.proteina * 4, macroData.carbs * 4, macroData.grasas * 9], backgroundColor: ['#dc2626', '#f5f5f5', '#525252'], borderColor: 'rgba(24, 24, 24, 0.85)', borderWidth: 4, hoverOffset: 8 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { color: '#e5e5e5' }}, tooltip: { callbacks: { label: c => `${c.label}: ${c.raw.toFixed(0)} kcal (${((c.raw/c.chart.getDatasetMeta(0).total)*100).toFixed(1)}%)` }}}} });
-
+    // --- ELEMENTOS DEL DOM ---
     const navLinks = document.querySelectorAll('#main-nav a, #mobile-nav a');
     const contentSections = document.querySelectorAll('.content-section');
-    navLinks.forEach(link => { link.addEventListener('click', e => { e.preventDefault(); const tabId = e.currentTarget.dataset.tab; contentSections.forEach(s => s.classList.remove('active')); document.getElementById(tabId).classList.add('active'); navLinks.forEach(l => {l.classList.remove('active'); l.classList.remove('nav-link-mobile.active');}); e.currentTarget.classList.add('active'); const mobileLink = document.querySelector(`#mobile-nav a[data-tab="${tabId}"]`); if(mobileLink) mobileLink.classList.add('active'); window.scrollTo({ top: 0, behavior: 'smooth' }); }); });
-    
     const workoutNav = document.getElementById('workout-nav');
     const workoutContent = document.getElementById('workout-content');
     
-    function createTableHTML(exercises) {
-        return `<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-left text-red-500 border-b border-gray-700"><th class="p-2">Ejercicio</th><th class="p-2 text-center">Series</th><th class="p-2 text-center">Reps</th><th class="p-2 text-center">Descanso</th><th class="p-2 text-center">RIR</th></tr></thead><tbody class="divide-y divide-gray-800">${exercises.map(ex => `<tr class="text-gray-300"><td class="p-2 font-semibold">${ex.name}</td><td class="p-2 text-center">${ex.sets}</td><td class="p-2 text-center">${ex.reps}</td><td class="p-2 text-center">${ex.rest}</td><td class="p-2 text-center font-bold text-red-500">${ex.rir}</td></tr>`).join('')}</tbody></table></div>`;
+    // --- LÓGICA DE NAVEGACIÓN ---
+    navLinks.forEach(link => { 
+        link.addEventListener('click', e => { 
+            e.preventDefault(); 
+            const tabId = e.currentTarget.dataset.tab; 
+            contentSections.forEach(s => s.classList.remove('active')); 
+            document.getElementById(tabId).classList.add('active'); 
+            navLinks.forEach(l => {
+                l.classList.remove('active');
+                if (l.dataset.tab === tabId) {
+                    l.classList.add('active');
+                }
+            }); 
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        }); 
+    });
+
+    // --- LÓGICA MODAL (ALERTA/CONFIRMACIÓN) ---
+    const alertModal = document.getElementById('alert-modal');
+    const alertModalMessage = document.getElementById('alert-modal-message');
+    const alertModalButtons = document.getElementById('alert-modal-buttons');
+
+    function showAlert(message) {
+        alertModalMessage.textContent = message;
+        alertModalButtons.innerHTML = `<button id="alert-ok-btn" class="btn-primary">OK</button>`;
+        alertModal.style.display = 'block';
+        document.getElementById('alert-ok-btn').onclick = () => alertModal.style.display = 'none';
     }
 
-    // --- FUNCIÓN RENDERIZADO ACTUALIZADA ---
-    function renderWorkout(day) {
-        const data = workoutData[day];
-        let html = `<h3 class="text-xl font-bold mb-2 text-white">${data.title}</h3><p class="text-gray-400 mb-4">${data.description}</p>`;
-        html += createTableHTML(data.main_work);
-        if (data.specific_work && data.specific_work.length > 0) {
-            html += `<h4 class="text-lg font-semibold mt-6 mb-2 text-red-400">Trabajo Específico (Abdomen/Antebrazo)</h4>`;
-            html += createTableHTML(data.specific_work);
-        }
-        if (data.cardio) {
-            html += `<h4 class="text-lg font-semibold mt-6 mb-2 text-cyan-400">Cardio Finalizador</h4>`;
-            html += `<div class="bg-black/20 p-4 rounded-lg border border-gray-700">
-                        <p class="text-xl font-bold text-center text-white">${data.cardio.name}</p>
-                        <p class="text-md text-gray-400 text-center mt-1">${data.cardio.details}</p>
-                     </div>`;
-        }
-        workoutContent.innerHTML = html;
+    function showConfirm(message, onConfirm) {
+        alertModalMessage.textContent = message;
+        alertModalButtons.innerHTML = `
+            <button id="confirm-cancel-btn" class="btn-secondary">Cancelar</button>
+            <button id="confirm-ok-btn" class="btn-danger">Confirmar</button>
+        `;
+        alertModal.style.display = 'block';
+        document.getElementById('confirm-ok-btn').onclick = () => {
+            alertModal.style.display = 'none';
+            onConfirm();
+        };
+        document.getElementById('confirm-cancel-btn').onclick = () => alertModal.style.display = 'none';
     }
 
-    workoutNav.addEventListener('click', e => { if (e.target.tagName === 'BUTTON') { const day = e.target.dataset.day; workoutNav.querySelectorAll('button').forEach(btn => btn.classList.remove('active')); e.target.classList.add('active'); renderWorkout(day); } });
-    renderWorkout('1');
+    // --- LÓGICA DE GRÁFICOS ---
+    function renderMacroChart() {
+        if (macroChartInstance) {
+            macroChartInstance.destroy();
+        }
+        macroChartInstance = new Chart(document.getElementById('macroChart').getContext('2d'), { type: 'doughnut', data: { labels: ['Proteína', 'Carbs', 'Grasas'], datasets: [{ data: [macroData.proteina * 4, macroData.carbs * 4, macroData.grasas * 9], backgroundColor: ['#dc2626', '#f5f5f5', '#525252'], borderColor: 'rgba(24, 24, 24, 0.85)', borderWidth: 4, hoverOffset: 8 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { color: '#e5e5e5' }}, tooltip: { callbacks: { label: c => `${c.label}: ${c.raw.toFixed(0)} kcal (${((c.raw/c.chart.getDatasetMeta(0).total)*100).toFixed(1)}%)` }}}} });
+    }
 
+    function updateMacroDisplay() {
+        document.getElementById('total-calorias').textContent = Math.round(macroData.calorias);
+        document.getElementById('gramos-proteina').textContent = `${Math.round(macroData.proteina)}g`;
+        document.getElementById('gramos-carbs').textContent = `${Math.round(macroData.carbs)}g`;
+        document.getElementById('gramos-grasas').textContent = `${Math.round(macroData.grasas)}g`;
+        renderMacroChart();
+        renderDailyLog(); // Re-render log to update progress bars
+    }
+
+    // --- LÓGICA DE ENTRENAMIENTO ---
+    function createTableHTML(exercises) { 
+        const header = `<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-left text-red-500 border-b border-gray-700"><th class="p-2">Ejercicio</th><th class="p-2 text-center">Series</th><th class="p-2 text-center">Reps</th><th class="p-2 text-center">Descanso</th><th class="p-2 text-center">RIR</th><th class="p-2 text-center">Asistente IA</th></tr></thead>`;
+        const body = `<tbody class="divide-y divide-gray-800">${exercises.map(ex => `<tr class="text-gray-300"><td class="p-2 font-semibold">${ex.name}</td><td class="p-2 text-center">${ex.sets}</td><td class="p-2 text-center">${ex.reps}</td><td class="p-2 text-center">${ex.rest}</td><td class="p-2 text-center font-bold text-red-500">${ex.rir}</td><td class="p-2 text-center space-x-1"><button class="btn-secondary ai-action-btn btn-explain" data-exercise-name="${ex.name}">Explicar</button><button class="btn-secondary ai-action-btn btn-variation" data-exercise-name="${ex.name}">Alternativa</button></td></tr>`).join('')}</tbody>`;
+        return `${header}${body}</table></div>`;
+    }
+
+    function renderWorkout(day) { 
+        const data = workoutData[day]; 
+        let html = `<h3 class="text-xl font-bold mb-2 text-white">${data.title}</h3><p class="text-gray-400 mb-4">${data.description}</p>`; 
+        html += createTableHTML(data.main_work); 
+        if (data.specific_work && data.specific_work.length > 0) { 
+            html += `<h4 class="text-lg font-semibold mt-6 mb-2 text-red-400">Trabajo Específico (Abdomen/Antebrazo)</h4>`; 
+            html += createTableHTML(data.specific_work); 
+        } 
+        if (data.cardio) { 
+            html += `<h4 class="text-lg font-semibold mt-6 mb-2 text-cyan-400">Cardio Finalizador</h4>`; 
+            html += `<div class="bg-black/20 p-4 rounded-lg border border-gray-700"><p class="text-xl font-bold text-center text-white">${data.cardio.name}</p><p class="text-md text-gray-400 text-center mt-1">${data.cardio.details}</p></div>`; 
+        } 
+        workoutContent.innerHTML = html; 
+    }
+    
+    workoutNav.addEventListener('click', e => { if (e.target.tagName === 'BUTTON') { activeWorkoutDay = e.target.dataset.day; workoutNav.querySelectorAll('button').forEach(btn => btn.classList.remove('active')); e.target.classList.add('active'); renderWorkout(activeWorkoutDay); } });
+    
+    // --- LÓGICA DE ALMACENAMIENTO Y PROGRESO ---
     let measurements = JSON.parse(localStorage.getItem('fitnessMeasurementsDR')) || [];
     let notes = JSON.parse(localStorage.getItem('fitnessNotesDR')) || [];
     let lifts = JSON.parse(localStorage.getItem('fitnessLiftsDR')) || [];
@@ -270,43 +391,264 @@ document.addEventListener('DOMContentLoaded', function () {
     const liftHistoryEl = document.getElementById('lifts-history');
     const liftExerciseSelect = document.getElementById('lift-exercise');
     const liftFilterSelect = document.getElementById('lift-filter');
-
     const allExercises = [...new Set(Object.values(workoutData).flatMap(day => [...day.main_work, ...(day.specific_work || [])].map(ex => ex.name)))].sort();
-    function populateExerciseSelects() {
-        liftFilterSelect.innerHTML = '<option value="all">Todos los Ejercicios</option>';
-        liftExerciseSelect.innerHTML = '<option value="">Selecciona Ejercicio</option>';
-        allExercises.forEach(ex => {
-            liftExerciseSelect.innerHTML += `<option value="${ex}">${ex}</option>`;
-            liftFilterSelect.innerHTML += `<option value="${ex}">${ex}</option>`;
-        });
-    }
 
-    function renderMeasurements() { measurements.sort((a,b)=>new Date(b.date)-new Date(a.date)); measureHistoryEl.innerHTML = measurements.map(m=>`<tr><td class="p-2">${new Date(m.date).toLocaleDateString('es-CO',{timeZone:'UTC'})}</td><td class="p-2">${m.weight} kg</td><td class="p-2">${m.waist} cm</td><td class="p-2 text-right"><button class="btn-danger" data-id="${m.id}">X</button></td></tr>`).join(''); }
-    function renderNotes() { notes.sort((a,b)=>b.id-a.id); notesHistoryEl.innerHTML = notes.map(n=>`<div class="bg-black/20 p-3 rounded-lg"><p class="text-sm text-gray-300 whitespace-pre-wrap">${n.text}</p><div class="text-xs text-gray-500 mt-2 flex justify-between items-center">${n.date} <button class="btn-danger" data-id="${n.id}">X</button></div></div>`).join(''); }
-    function renderLifts() {
-        lifts.sort((a, b) => new Date(b.date) - new Date(a.date));
-        const filter = liftFilterSelect.value;
-        const filteredLifts = filter === 'all' ? lifts : lifts.filter(l => l.exercise === filter);
-        liftHistoryEl.innerHTML = filteredLifts.map(l => `<tr><td class="p-2">${new Date(l.date).toLocaleDateString('es-CO', {timeZone:'UTC'})}</td><td class="p-2 font-semibold">${l.exercise}</td><td class="p-2">${l.weight} kg</td><td class="p-2">${l.reps}</td><td class="p-2 text-right"><button class="btn-danger" data-id="${l.id}">X</button></td></tr>`).join('');
-    }
-
-    measureForm.addEventListener('submit', e=>{ e.preventDefault(); if(!e.target.elements['measure-date'].value) {alert('Selecciona una fecha.'); return;} measurements.push({id:Date.now(),date:e.target.elements['measure-date'].value,weight:e.target.elements['measure-weight'].value||'N/A',waist:e.target.elements['measure-waist'].value||'N/A'}); localStorage.setItem('fitnessMeasurementsDR', JSON.stringify(measurements)); renderMeasurements(); e.target.reset(); e.target.elements['measure-date'].valueAsDate = new Date(); });
-    notesForm.addEventListener('submit', e=>{ e.preventDefault(); const text=e.target.elements['note-text'].value.trim(); if(!text) return; notes.push({id:Date.now(),date:new Date().toLocaleString('es-CO'),text}); localStorage.setItem('fitnessNotesDR',JSON.stringify(notes)); renderNotes(); e.target.reset(); });
-    liftForm.addEventListener('submit', e=>{ e.preventDefault(); const exercise = e.target.elements['lift-exercise'].value; const weight = e.target.elements['lift-weight'].value; const reps = e.target.elements['lift-reps'].value; if(!exercise || !weight || !reps) { alert('Completa todos los campos del levantamiento.'); return;} lifts.push({id:Date.now(),date:new Date().toISOString().split('T')[0],exercise,weight,reps}); localStorage.setItem('fitnessLiftsDR',JSON.stringify(lifts)); renderLifts(); e.target.reset(); });
+    function populateExerciseSelects() { liftFilterSelect.innerHTML = '<option value="all">Todos los Ejercicios</option>'; liftExerciseSelect.innerHTML = '<option value="">Selecciona Ejercicio</option>'; allExercises.forEach(ex => { liftExerciseSelect.innerHTML += `<option value="${ex}">${ex}</option>`; liftFilterSelect.innerHTML += `<option value="${ex}">${ex}</option>`; }); }
+    function renderMeasurements() { measurements.sort((a,b)=>new Date(b.date)-new Date(a.date)); measureHistoryEl.innerHTML = measurements.map(m=>`<tr><td class="p-2">${new Date(m.date).toLocaleDateString('es-CO',{timeZone:'UTC'})}</td><td class="p-2">${m.weight||'N/A'} kg</td><td class="p-2">${m.waist||'N/A'} cm</td><td class="p-2">${m.chest||'N/A'} cm</td><td class="p-2">${m.arm||'N/A'} cm</td><td class="p-2 text-right"><button class="btn-danger delete-btn" data-type="measure" data-id="${m.id}">X</button></td></tr>`).join(''); }
+    function renderNotes() { notes.sort((a,b)=>b.id-a.id); notesHistoryEl.innerHTML = notes.map(n=>`<div class="bg-black/20 p-3 rounded-lg"><p class="text-sm text-gray-300 whitespace-pre-wrap">${n.text}</p><div class="text-xs text-gray-500 mt-2 flex justify-between items-center">${n.date} <button class="btn-danger delete-btn" data-type="note" data-id="${n.id}">X</button></div></div>`).join(''); }
+    function renderLifts() { lifts.sort((a, b) => new Date(b.date) - new Date(a.date)); const filter = liftFilterSelect.value; const filteredLifts = filter === 'all' ? lifts : lifts.filter(l => l.exercise === filter); liftHistoryEl.innerHTML = filteredLifts.map(l => `<tr><td class="p-2">${new Date(l.date).toLocaleDateString('es-CO', {timeZone:'UTC'})}</td><td class="p-2 font-semibold">${l.exercise}</td><td class="p-2">${l.weight} kg</td><td class="p-2">${l.reps}</td><td class="p-2 text-right"><button class="btn-danger delete-btn" data-type="lift" data-id="${l.id}">X</button></td></tr>`).join(''); }
     
-    measureHistoryEl.addEventListener('click', e => { if (e.target.classList.contains('btn-danger')) { measurements = measurements.filter(m => m.id !== Number(e.target.dataset.id)); localStorage.setItem('fitnessMeasurementsDR', JSON.stringify(measurements)); renderMeasurements(); } });
-    notesHistoryEl.addEventListener('click', e => { if (e.target.classList.contains('btn-danger')) { notes = notes.filter(n => n.id !== Number(e.target.dataset.id)); localStorage.setItem('fitnessNotesDR', JSON.stringify(notes)); renderNotes(); } });
-    liftHistoryEl.addEventListener('click', e => { if (e.target.classList.contains('btn-danger')) { lifts = lifts.filter(l => l.id !== Number(e.target.dataset.id)); localStorage.setItem('fitnessLiftsDR', JSON.stringify(lifts)); renderLifts(); } });
-    liftFilterSelect.addEventListener('change', renderLifts);
+    measureForm.addEventListener('submit', e=>{ e.preventDefault(); if(!e.target.elements['measure-date'].value) { showAlert('Selecciona una fecha.'); return;} measurements.push({id:Date.now(),date:e.target.elements['measure-date'].value,weight:e.target.elements['measure-weight'].value||'N/A',waist:e.target.elements['measure-waist'].value||'N/A',chest:e.target.elements['measure-chest'].value||'N/A',arm:e.target.elements['measure-arm'].value||'N/A'}); localStorage.setItem('fitnessMeasurementsDR', JSON.stringify(measurements)); renderMeasurements(); e.target.reset(); e.target.elements['measure-date'].valueAsDate = new Date(); });
+    notesForm.addEventListener('submit', e=>{ e.preventDefault(); const text=e.target.elements['note-text'].value.trim(); if(!text) return; notes.push({id:Date.now(),date:new Date().toLocaleString('es-CO'),text}); localStorage.setItem('fitnessNotesDR',JSON.stringify(notes)); renderNotes(); e.target.reset(); });
+    liftForm.addEventListener('submit', e=>{ e.preventDefault(); const exercise = e.target.elements['lift-exercise'].value; const weight = e.target.elements['lift-weight'].value; const reps = e.target.elements['lift-reps'].value; if(!exercise || !weight || !reps) { showAlert('Completa todos los campos del levantamiento.'); return;} lifts.push({id:Date.now(),date:new Date().toISOString().split('T')[0],exercise,weight,reps}); localStorage.setItem('fitnessLiftsDR',JSON.stringify(lifts)); renderLifts(); e.target.reset(); });
+    
+    document.getElementById('progreso').addEventListener('click', e => { 
+        if (e.target.classList.contains('delete-btn')) { 
+            const id = Number(e.target.dataset.id);
+            const type = e.target.dataset.type;
+            showConfirm('¿Estás seguro de que quieres borrar este registro?', () => {
+                if(type === 'measure') { measurements = measurements.filter(m => m.id !== id); localStorage.setItem('fitnessMeasurementsDR', JSON.stringify(measurements)); renderMeasurements(); }
+                if(type === 'note') { notes = notes.filter(n => n.id !== id); localStorage.setItem('fitnessNotesDR', JSON.stringify(notes)); renderNotes(); }
+                if(type === 'lift') { lifts = lifts.filter(l => l.id !== id); localStorage.setItem('fitnessLiftsDR', JSON.stringify(lifts)); renderLifts(); }
+            });
+        } 
+    });
 
+    liftFilterSelect.addEventListener('change', renderLifts);
+    
+    // --- LÓGICA DE RECURSOS (CALCULADORAS) ---
     document.getElementById('1rm-form').addEventListener('submit', e => { e.preventDefault(); const w = parseFloat(e.target.elements['1rm-weight'].value); const r = parseInt(e.target.elements['1rm-reps'].value); if(w > 0 && r > 0){ const rm = w * (1 + (r/30)); document.getElementById('1rm-result').textContent = `1RM Estimado: ${rm.toFixed(1)} kg`; } else { document.getElementById('1rm-result').textContent = 'Datos inválidos'; } });
     document.getElementById('rir-form').addEventListener('submit', e => { e.preventDefault(); const rm1 = parseFloat(e.target.elements['rir-1rm'].value); const reps = parseInt(e.target.elements['rir-reps'].value); const rir = parseInt(e.target.elements['rir-rir'].value); if(rm1 > 0 && reps > 0 && rir >= 0){ const totalReps = reps + rir; const intensity = 1 - (0.025 * totalReps); const weight = rm1 * intensity; document.getElementById('rir-result').textContent = `Peso Sugerido: ${weight.toFixed(1)} kg`; } else { document.getElementById('rir-result').textContent = 'Datos inválidos'; } });
+    
+    // --- LÓGICA DE FIT-AI Y API ---
+    const productDatabase = { "7501055300077": { name: "Coca-Cola Original (355ml)", calories: 149, protein: 0, carbs: 39, fat: 0 }, "888849003611": { name: "Quest Bar - Chocolate Chip", calories: 190, protein: 21, carbs: 22, fat: 9 }, "086600244108": { name: "Atún en Agua (lata 142g)", calories: 120, protein: 26, carbs: 0, fat: 1.5 } };
+    const aiResultLoader = document.getElementById('ai-result-loader');
+    const aiResultContent = document.getElementById('ai-result-content');
+    const dailyLogHistory = document.getElementById('daily-log-history');
+    const dailyLogProgress = document.getElementById('daily-log-progress');
+    let dailyLog = JSON.parse(localStorage.getItem('fitAIDailyLogDR')) || { date: new Date().toISOString().split('T')[0], meals: [], totals: { calories: 0, protein: 0, carbs: 0, fat: 0 }};
+    let codeReader; 
 
+    const aiModal = document.getElementById('ai-modal');
+    const aiModalTitle = document.getElementById('ai-modal-title');
+    const aiModalContent = document.getElementById('ai-modal-content');
+    const aiModalLoaderEl = document.getElementById('ai-modal-loader');
+    const aiModalClose = document.getElementById('ai-modal-close');
+
+    function showAiModal(title, content = '') { aiModalTitle.textContent = title; aiModalContent.innerHTML = content; aiModalLoaderEl.style.display = 'none'; aiModal.style.display = 'block'; }
+    function showAiModalLoading(title) { aiModalTitle.textContent = title; aiModalContent.innerHTML = ''; aiModalLoaderEl.style.display = 'flex'; aiModal.style.display = 'block'; }
+    function hideAiModal() { aiModal.style.display = 'none'; }
+    aiModalClose.addEventListener('click', hideAiModal);
+
+    function setButtonsLoading(isLoading) { document.querySelectorAll('.btn-primary, .btn-secondary.ai-action-btn').forEach(btn => btn.disabled = isLoading); }
+    function checkDateAndResetLog() { const today = new Date().toISOString().split('T')[0]; if (dailyLog.date !== today) { dailyLog = { date: today, meals: [], totals: { calories: 0, protein: 0, carbs: 0, fat: 0 } }; saveDailyLog(); } }
+    function toBase64(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result.split(',')[1]); reader.onerror = error => reject(error); }); }
+    function setAILoading(isLoading) { aiResultLoader.style.display = isLoading ? 'flex' : 'none'; aiResultContent.style.display = isLoading ? 'none' : 'block'; if(isLoading) aiResultContent.innerHTML = ''; }
+    
+    async function callGeminiAPI(prompt, base64ImageData = null) {
+        setButtonsLoading(true);
+        // The API Key will be automatically injected in the production environment.
+        const apiKey = "AIzaSyB2CH17D7HzmB1eJ6h7KIxNlBx6bF_QrnU"; 
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        
+        let userParts = [{ text: prompt }];
+        if (base64ImageData) { userParts.push({ inlineData: { mimeType: "image/jpeg", data: base64ImageData } }); }
+        
+        const payload = { 
+            contents: [{ role: "user", parts: userParts }], 
+            generationConfig: { responseMimeType: "application/json" } 
+        };
+        
+        try {
+            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (!response.ok) {
+                 const errorBody = await response.text();
+                 throw new Error(`Error en la API: ${response.statusText}. Detalles: ${errorBody}`);
+            }
+            const result = await response.json();
+
+            if (result.candidates && result.candidates[0].finishReason === "SAFETY") {
+                 throw new Error("La solicitud fue bloqueada por políticas de seguridad. Intenta con una consulta diferente.");
+            }
+            if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
+                try {
+                    return JSON.parse(result.candidates[0].content.parts[0].text);
+                } catch(parseError) {
+                    throw new Error(`Error al procesar la respuesta de la API. Respuesta no es un JSON válido. ${parseError.message}`);
+                }
+            } else {
+                 throw new Error("Respuesta inválida o vacía de la API.");
+            }
+        } catch (error) {
+            console.error("Error llamando a la API de Gemini:", error);
+            showAlert(`Error de IA: ${error.message}`);
+            return { error: error.message };
+        } finally {
+            setButtonsLoading(false);
+        }
+    }
+
+    function renderAnalysisResult(data) {
+        if (!data || data.error) { aiResultContent.innerHTML = `<p class="text-red-400">Error: ${data?.error || 'No se pudo procesar la solicitud.'}</p>`; return; }
+        const mealData = { id: Date.now(), name: data.name || "Comida Desconocida", calories: parseInt(data.calories) || 0, protein: parseInt(data.protein) || 0, carbs: parseInt(data.carbs) || 0, fat: parseInt(data.fat) || 0 };
+        let html = `<h4 class="text-xl font-bold text-white mb-2">${mealData.name}</h4>`;
+        html += `<div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center mb-4"><div><p class="text-sm text-gray-400">Calorías</p><p class="font-bold text-lg">${mealData.calories}</p></div><div><p class="text-sm text-red-400">Proteína</p><p class="font-bold text-lg">${mealData.protein}g</p></div><div><p class="text-sm text-gray-300">Carbs</p><p class="font-bold text-lg">${mealData.carbs}g</p></div><div><p class="text-sm text-gray-500">Grasas</p><p class="font-bold text-lg">${mealData.fat}g</p></div></div>`;
+        if (data.ingredients?.length > 0) { html += `<div class="text-left mt-4"><h5 class="font-semibold mb-2">Ingredientes Sugeridos:</h5><ul class="list-disc list-inside text-gray-300 text-sm space-y-1">${data.ingredients.map(i => `<li>${i}</li>`).join('')}</ul></div>`; }
+        html += `<button id="add-to-log-btn" class="btn-primary w-full mt-4">Añadir al registro diario</button>`;
+        aiResultContent.innerHTML = html;
+        document.getElementById('add-to-log-btn').onclick = () => { addMealToLog(mealData); aiResultContent.innerHTML = `<p class="text-green-400 font-bold text-center">¡Añadido a tu registro!</p>`; document.getElementById('image-preview').classList.add('hidden'); document.getElementById('recipe-search-input').value = ''; };
+    }
+
+    function saveDailyLog() { localStorage.setItem('fitAIDailyLogDR', JSON.stringify(dailyLog)); }
+    function addMealToLog(meal) { dailyLog.meals.push(meal); dailyLog.totals.calories += meal.calories; dailyLog.totals.protein += meal.protein; dailyLog.totals.carbs += meal.carbs; dailyLog.totals.fat += meal.fat; saveDailyLog(); renderDailyLog(); }
+    function renderDailyLog() {
+        dailyLogHistory.innerHTML = dailyLog.meals.length > 0 ? dailyLog.meals.map(m => `<div class="bg-black/20 p-3 rounded-lg text-sm"><div class="flex justify-between items-start"><p class="font-semibold text-white flex-1 pr-2">${m.name}</p><button class="btn-danger delete-btn" data-type="log" data-id="${m.id}">X</button></div><p class="text-gray-400 mt-1">${m.calories}kcal | P:${m.protein}g C:${m.carbs}g G:${m.fat}g</p></div>`).join('') : '<p class="text-center text-gray-500">No hay comidas registradas hoy.</p>';
+        const totals = dailyLog.totals; const targets = macroData;
+        const progressData = [ { label: 'Calorías', current: totals.calories, target: targets.calorias, color: 'bg-yellow-500' }, { label: 'Proteína', current: totals.protein, target: targets.proteina, color: 'bg-red-500' }, { label: 'Carbs', current: totals.carbs, target: targets.carbs, color: 'bg-blue-500' }, { label: 'Grasas', current: totals.fat, target: targets.grasas, color: 'bg-purple-500' }, ];
+        dailyLogProgress.innerHTML = progressData.map(p => { const percentage = p.target > 0 ? Math.min((p.current / p.target) * 100, 100) : 0; return `<div class="mb-3"><div class="flex justify-between items-baseline mb-1 text-sm"><span class="font-bold">${p.label}</span><span class="text-gray-400">${Math.round(p.current)} / ${p.target} ${p.label === 'Calorías' ? 'kcal' : 'g'}</span></div><div class="progress-bar-bg h-2.5 w-full"><div class="progress-bar ${p.color}" style="width: ${percentage}%"></div></div></div>`; }).join('');
+    }
+
+    document.getElementById('analyze-image-btn').addEventListener('click', async () => { const file = document.getElementById('food-image-input').files[0]; if (!file) { showAlert('Por favor, selecciona una imagen primero.'); return; } setAILoading(true); try { const base64ImageData = await toBase64(file); const prompt = "Analiza la imagen de esta comida. Identifica los alimentos y estima la cantidad de calorías, proteínas, carbohidratos y grasas. Devuelve la respuesta únicamente como un objeto JSON con las siguientes claves: 'name' (un nombre descriptivo para la comida), 'calories', 'protein', 'carbs', 'fat', y 'ingredients' (un array de strings con los ingredientes que identificas)."; const result = await callGeminiAPI(prompt, base64ImageData); renderAnalysisResult(result); } catch (error) { aiResultContent.innerHTML = `<p class="text-red-500">Error al analizar la imagen: ${error.message}</p>`; } finally { setAILoading(false); } });
+    document.getElementById('food-image-input').addEventListener('change', (event) => { const imagePreview = document.getElementById('image-preview'); if (event.target.files?.[0]) { const reader = new FileReader(); reader.onload = (e) => { imagePreview.src = e.target.result; imagePreview.classList.remove('hidden'); }; reader.readAsDataURL(event.target.files[0]); } });
+    document.getElementById('clear-log-btn').addEventListener('click', () => { showConfirm('¿Estás seguro de que quieres borrar todas las comidas de hoy?', () => { dailyLog.meals = []; dailyLog.totals = { calories: 0, protein: 0, carbs: 0, fat: 0 }; saveDailyLog(); renderDailyLog(); }); });
+    dailyLogHistory.addEventListener('click', (e) => { if (e.target.classList.contains('delete-btn') && e.target.dataset.type === 'log') { const mealId = Number(e.target.dataset.id); const mealToRemove = dailyLog.meals.find(m => m.id === mealId); if (mealToRemove) { showConfirm('¿Seguro que quieres borrar esta comida del registro?', () => { dailyLog.totals.calories -= mealToRemove.calories; dailyLog.totals.protein -= mealToRemove.protein; dailyLog.totals.carbs -= mealToRemove.carbs; dailyLog.totals.fat -= mealToRemove.fat; dailyLog.meals = dailyLog.meals.filter(m => m.id !== mealId); saveDailyLog(); renderDailyLog(); }); } } });
+    
+    document.getElementById('recipe-search-form').addEventListener('submit', async (e) => { e.preventDefault(); const searchTerm = document.getElementById('recipe-search-input').value.trim(); if (searchTerm.length < 3) { showAlert('Introduce un término de búsqueda más largo.'); return; } setAILoading(true); try { const prompt = `Genera una receta simple y saludable para "${searchTerm}". Incluye una estimación de sus macros. Devuelve la respuesta únicamente como un objeto JSON con las siguientes claves: 'name' (nombre de la receta), 'calories', 'protein', 'carbs', 'fat', y 'ingredients' (un array de strings).`; const result = await callGeminiAPI(prompt); renderAnalysisResult(result); } catch (error) { aiResultContent.innerHTML = `<p class="text-red-500">Error al buscar la receta: ${error.message}</p>`; } finally { setAILoading(false); } });
+    document.getElementById('meal-plan-form').addEventListener('submit', async (e) => { e.preventDefault(); const prefs = document.getElementById('meal-plan-prefs').value.trim(); showAiModalLoading("✨ Generando tu Plan de Comidas..."); try { const prompt = `Eres un nutricionista experto en fitness. Genera un plan de comidas de un día completo para alcanzar los siguientes objetivos: ${macroData.calorias} kcal, ${macroData.proteina}g de proteína, ${macroData.carbs}g de carbohidratos, y ${macroData.grasas}g de grasa. ${prefs ? `Considera las siguientes preferencias del usuario: ${prefs}.` : ''} El plan debe tener 5 comidas. Para cada comida, proporciona su nombre, una lista de ingredientes con cantidades, y los macros estimados. La suma total de los macros del día debe ser lo más cercana posible a los objetivos. Devuelve la respuesta ÚNICAMENTE como un objeto JSON con la clave "meal_plan", que es un array de objetos. Cada objeto de comida debe tener las claves "name", "ingredients" (array de strings), y "macros" (un objeto con "calories", "protein", "carbs", "fat").`; const result = await callGeminiAPI(prompt); if (result.error) throw new Error(result.error); let totalCalculated = {calories: 0, protein: 0, carbs: 0, fat: 0}; let mealPlanHtml = result.meal_plan.map(meal => { totalCalculated.calories += meal.macros.calories; totalCalculated.protein += meal.macros.protein; totalCalculated.carbs += meal.macros.carbs; totalCalculated.fat += meal.macros.fat; return `<div class="bg-black/20 p-4 rounded-lg mb-4 border border-gray-800"><h4 class="font-bold text-red-500 text-lg">${meal.name}</h4><ul class="list-disc list-inside text-gray-300 text-sm my-2 space-y-1 pl-2">${meal.ingredients.map(i => `<li>${i}</li>`).join('')}</ul><div class="text-xs grid grid-cols-4 gap-2 text-center mt-3 bg-black/30 p-2 rounded-md"><div><span class="font-bold text-gray-400">Calorías</span><br>${meal.macros.calories}</div><div><span class="font-bold text-red-400">Proteína</span><br>${meal.macros.protein}g</div><div><span class="font-bold text-gray-200">Carbs</span><br>${meal.macros.carbs}g</div><div><span class="font-bold text-gray-500">Grasas</span><br>${meal.macros.fat}g</div></div></div>`; }).join(''); const totalsHtml = `<div class="bg-gray-900 p-4 rounded-lg mt-6 border border-red-500/50"><h4 class="font-bold text-white text-lg text-center mb-2">Totales Estimados del Día</h4><div class="text-sm grid grid-cols-2 md:grid-cols-4 gap-3 text-center"><div><p class="font-bold">Calorías</p><p>${totalCalculated.calories} / ${macroData.calorias}</p></div><div><p class="font-bold text-red-400">Proteína</p><p>${totalCalculated.protein}g / ${macroData.proteina}g</p></div><div><p class="font-bold text-gray-200">Carbs</p><p>${totalCalculated.carbs}g / ${macroData.carbs}g</p></div><div><p class="font-bold text-gray-500">Grasas</p><p>${totalCalculated.fat}g / ${macroData.grasas}g</p></div></div></div>`; aiModalContent.innerHTML = mealPlanHtml + totalsHtml; aiModalLoaderEl.style.display = 'none'; } catch(error) { aiModalContent.innerHTML = `<p class="text-red-500 text-center">Hubo un error al generar el plan: ${error.message}</p>`; aiModalLoaderEl.style.display = 'none'; } });
+    document.getElementById('analyze-progress-btn').addEventListener('click', async () => { if (measurements.length < 2 && lifts.length < 3) { showAlert('Necesitas registrar al menos 2 mediciones y 3 levantamientos para un análisis significativo.'); return; } showAiModalLoading("✨ Analizando tu Progreso..."); try { const prompt = `Eres un coach de fitness experto y motivador. Analiza los datos de progreso de un usuario y escribe un resumen positivo y alentador en español. Compara las primeras y últimas mediciones para resaltar cambios. Menciona el mejor levantamiento (calculado como peso * repeticiones). Si detectas un posible estancamiento en algún ejercicio (múltiples registros sin mejora), sugiere amablemente una técnica para romperlo (ej. dropset, pausa-descanso, o cambiar de ejercicio). Mantén el análisis conciso y en un tono inspirador. Los datos del usuario son: Medidas: ${JSON.stringify(measurements)}. Levantamientos: ${JSON.stringify(lifts)}. Devuelve la respuesta ÚNICAMENTE como un objeto JSON con la clave "analysis_text" que contenga tu análisis como un string con formato de párrafos (usa \\n para saltos de línea).`; const result = await callGeminiAPI(prompt); if (result.error) throw new Error(result.error); const formattedText = result.analysis_text.replace(/\\n/g, '<br><br>'); aiModalContent.innerHTML = `<p class="text-gray-300 leading-relaxed">${formattedText}</p>`; aiModalLoaderEl.style.display = 'none'; } catch (error) { aiModalContent.innerHTML = `<p class="text-red-500 text-center">Hubo un error al analizar tu progreso: ${error.message}</p>`; aiModalLoaderEl.style.display = 'none'; } });
+    
+    // --- FUNCIONES DE IA PARA ENTRENAMIENTO ---
+    workoutContent.addEventListener('click', async (e) => {
+        const target = e.target.closest('.ai-action-btn');
+        if (!target) return;
+        const exerciseName = target.dataset.exerciseName;
+
+        const handleResult = (result, type) => {
+            if (result.error) throw new Error(result.error);
+            if (type === 'explain') {
+                const formattedText = result.explanation_text.replace(/\n/g, '<br><br>').replace(/\*/g, '&bull; ');
+                aiModalContent.innerHTML = `<p class="text-gray-300 leading-relaxed">${formattedText}</p>`;
+            } else if (type === 'variation') {
+                let alternativesHtml = result.alternatives.map(alt => `<div class="bg-black/20 p-4 rounded-lg mb-3 border border-gray-800"><h4 class="font-bold text-red-400">${alt.name}</h4><p class="text-gray-300 text-sm mt-1">${alt.description}</p></div>`).join('');
+                aiModalContent.innerHTML = alternativesHtml;
+            }
+            aiModalLoaderEl.style.display = 'none';
+        };
+
+        const handleError = (error, action) => {
+            aiModalContent.innerHTML = `<p class="text-red-500 text-center">Hubo un error al ${action}: ${error.message}</p>`;
+            aiModalLoaderEl.style.display = 'none';
+        };
+
+        if (target.classList.contains('btn-explain')) {
+            showAiModalLoading(`✨ Explicando: ${exerciseName}`);
+            const prompt = `Eres un entrenador personal experto. Proporciona una guía detallada y clara, paso a paso, sobre cómo realizar correctamente el ejercicio '${exerciseName}'. Incluye puntos clave sobre la postura, el movimiento y 2-3 errores comunes a evitar. Responde únicamente con un objeto JSON con la clave "explanation_text" que contenga el texto formateado con saltos de línea (usa \\n para párrafos y '*' para listas).`;
+            try {
+                const result = await callGeminiAPI(prompt);
+                handleResult(result, 'explain');
+            } catch (error) { handleError(error, 'obtener la explicación'); } 
+        }
+
+        if (target.classList.contains('btn-variation')) {
+             showAiModalLoading(`✨ Alternativas para: ${exerciseName}`);
+             const prompt = `Eres un entrenador personal creativo. Sugiere 3 ejercicios alternativos para '${exerciseName}'. Para cada alternativa, proporciona su nombre y una breve descripción de por qué es una buena variación (ej. diferente equipo, enfoca una parte ligeramente distinta del músculo). Responde únicamente con un objeto JSON con una clave 'alternatives', que es un array de objetos, donde cada objeto tiene las claves 'name' y 'description'.`;
+             try {
+                const result = await callGeminiAPI(prompt);
+                handleResult(result, 'variation');
+             } catch (error) { handleError(error, 'sugerir alternativas'); }
+        }
+    });
+
+    // --- Lógica del escáner de código de barras ---
+    function startScanner() { const scannerModal = document.getElementById('barcode-scanner-modal'); codeReader = new ZXing.BrowserMultiFormatReader(); scannerModal.style.display = 'block'; codeReader.decodeFromVideoDevice(undefined, 'video-scanner', (result, err) => { if (result) { stopScanner(); const barcode = result.getText(); const product = productDatabase[barcode]; if (product) { renderAnalysisResult(product); } else { aiResultContent.innerHTML = `<p class="text-yellow-400 text-center">Producto no encontrado en la base de datos local (Código: ${barcode}).<br>Prueba a buscarlo por nombre o analizar su tabla nutricional con la cámara.</p>`; } } if (err && !(err instanceof ZXing.NotFoundException)) { console.error(err); stopScanner(); aiResultContent.innerHTML = `<p class="text-red-400 text-center">Error al escanear: ${err.message}</p>`; } }); }
+    function stopScanner() { if (codeReader) { codeReader.reset(); } document.getElementById('barcode-scanner-modal').style.display = 'none'; }
+    document.getElementById('scan-barcode-btn').addEventListener('click', startScanner);
+    document.getElementById('close-scanner-btn').addEventListener('click', stopScanner);
+
+    // --- NUEVA LÓGICA DE IA (OBJETIVOS Y ENTRENAMIENTO) ---
+    document.getElementById('change-goal-ai-btn').addEventListener('click', () => {
+        const modalContent = `
+            <p class="text-gray-400 mb-4">Describe tu nuevo objetivo físico. Por ejemplo: "Quiero ganar masa muscular y peso", "Busco perder 5 kilos y definir", o "Necesito más energía para mis entrenamientos".</p>
+            <form id="change-goal-form">
+                <textarea id="goal-input" class="form-textarea" rows="3" placeholder="Mi nuevo objetivo es..."></textarea>
+                <button type="submit" class="btn-primary w-full mt-4">Calcular Nuevos Macros</button>
+            </form>
+        `;
+        showAiModal('✨ Ajustar Objetivo con IA', modalContent);
+
+        document.getElementById('change-goal-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const goal = document.getElementById('goal-input').value.trim();
+            if (!goal) {
+                showAlert('Por favor, describe tu objetivo.');
+                return;
+            }
+            showAiModalLoading('Calculando nuevos macros...');
+            const prompt = `Un usuario de fitness describe su nuevo objetivo como: "${goal}". Sus macros actuales son: Calorías: ${macroData.calorias}, Proteína: ${macroData.proteina}g, Carbs: ${macroData.carbs}g, Grasas: ${macroData.grasas}g. Basado en este nuevo objetivo, calcula y devuelve un nuevo conjunto de macros. Responde ÚNICAMENTE con un objeto JSON con las claves: "calorias", "proteina", "carbs", "grasas". Los valores deben ser numéricos.`;
+            try {
+                const result = await callGeminiAPI(prompt);
+                if (result.error) throw new Error(result.error);
+                if (result.calorias && result.proteina && result.carbs && result.grasas) {
+                    macroData = result;
+                    updateMacroDisplay();
+                    hideAiModal();
+                    showAlert('¡Tus objetivos nutricionales han sido actualizados!');
+                } else {
+                    throw new Error("La respuesta de la IA no tenía el formato esperado.");
+                }
+            } catch (error) {
+                aiModalContent.innerHTML = `<p class="text-red-500 text-center">Hubo un error al generar la sugerencia: ${error.message}</p>`;
+                aiModalLoaderEl.style.display = 'none';
+            }
+        });
+    });
+    
+    document.getElementById('modify-workout-ai-btn').addEventListener('click', () => {
+        const modalContent = `
+            <p class="text-gray-400 mb-4">Describe qué quieres cambiar en la rutina de hoy. Puedes pedir añadir un ejercicio, reemplazar uno existente o pedir alternativas.</p>
+            <p class="text-xs text-gray-500 mb-4">Ejemplos: "Reemplaza el Press de Banca por un ejercicio con mancuernas", "Añade un ejercicio para pantorrillas", "Sugiere una alternativa para las elevaciones laterales que pueda hacer en casa".</p>
+            <form id="modify-workout-form">
+                <textarea id="workout-modification-input" class="form-textarea" rows="3" placeholder="Quisiera..."></textarea>
+                <button type="submit" class="btn-primary w-full mt-4">Obtener Sugerencia de IA</button>
+            </form>
+        `;
+        showAiModal(`🦾 Modificar Día ${activeWorkoutDay}: ${workoutData[activeWorkoutDay].title}`, modalContent);
+
+        document.getElementById('modify-workout-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const request = document.getElementById('workout-modification-input').value.trim();
+            if (!request) {
+                showAlert('Por favor, describe tu petición.');
+                return;
+            }
+            showAiModalLoading('Generando sugerencia...');
+            const currentWorkoutJSON = JSON.stringify(workoutData[activeWorkoutDay]);
+            const prompt = `Eres un coach experto. Un usuario quiere modificar su rutina de hoy. Su petición es: "${request}". La rutina actual es: ${currentWorkoutJSON}. Proporciona una sugerencia para cumplir su petición. Responde ÚNICAMENTE con un objeto JSON con una clave "suggestion_text" que contenga tu sugerencia como texto formateado con saltos de línea (usa \\n para párrafos y '*' para listas). Explica el cambio y por qué lo sugieres.`;
+            try {
+                const result = await callGeminiAPI(prompt);
+                if (result.error) throw new Error(result.error);
+                const formattedText = result.suggestion_text.replace(/\\n/g, '<br><br>').replace(/\*/g, '&bull; ');
+                 aiModalTitle.textContent = "Sugerencia de la IA";
+                 aiModalContent.innerHTML = `<p class="text-gray-300 leading-relaxed">${formattedText}</p>`;
+                 aiModalLoaderEl.style.display = 'none';
+
+            } catch (error) {
+                 aiModalContent.innerHTML = `<p class="text-red-500 text-center">Hubo un error al generar la sugerencia: ${error.message}</p>`;
+                 aiModalLoaderEl.style.display = 'none';
+            }
+        });
+    });
+    
+    // --- CARGA INICIAL DE LA APLICACIÓN ---
     document.getElementById('measure-date').valueAsDate = new Date();
-    populateExerciseSelects();
-    renderMeasurements();
-    renderNotes();
+    populateExerciseSelects(); 
+    renderMeasurements(); 
+    renderNotes(); 
     renderLifts();
+    renderWorkout('1');
+    checkDateAndResetLog();
+    renderDailyLog();
+    renderMacroChart();
 });
 </script>
 </body>
