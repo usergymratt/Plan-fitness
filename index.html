@@ -12,14 +12,38 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --main-red: #dc2626; --dark-bg: #101010; --card-bg-opaque: #181818; --card-bg-translucent: rgba(24, 24, 24, 0.85); --text-light: #e5e5e5; --text-dark: #a3a3a3; }
+        
+        /* ESTILOS DE FONDO MODIFICADOS */
         body { 
             font-family: 'Inter', sans-serif;
-            background-image: linear-gradient(rgba(16, 16, 16, 0.7), rgba(16, 16, 16, 0.7)), url('https://images.pexels.com/photos/4164763/pexels-photo-4164763.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');
             background-size: cover;
             background-position: center center;
             background-attachment: fixed;
             color: var(--text-light);
+            /* Transición suave para el cambio de fondo */
+            transition: background-image 0.4s ease-in-out;
         }
+
+        /* Clase de fondo para cada sección con opacidad reducida para mayor claridad */
+        .bg-resumen {
+            background-image: linear-gradient(rgba(16, 16, 16, 0.65), rgba(16, 16, 16, 0.65)), url('https://images.pexels.com/photos/3253501/pexels-photo-3253501.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
+        }
+        .bg-fit-ai {
+             background-image: linear-gradient(rgba(16, 16, 16, 0.65), rgba(16, 16, 16, 0.65)), url('https://images.pexels.com/photos/4164844/pexels-photo-4164844.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
+        }
+        .bg-nutricion {
+            background-image: linear-gradient(rgba(16, 16, 16, 0.65), rgba(16, 16, 16, 0.65)), url('https://images.pexels.com/photos/6456299/pexels-photo-6456299.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
+        }
+        .bg-entrenamiento {
+            background-image: linear-gradient(rgba(16, 16, 16, 0.65), rgba(16, 16, 16, 0.65)), url('https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
+        }
+        .bg-progreso {
+            background-image: linear-gradient(rgba(16, 16, 16, 0.65), rgba(16, 16, 16, 0.65)), url('https://images.pexels.com/photos/2294361/pexels-photo-2294361.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
+        }
+        .bg-recursos {
+            background-image: linear-gradient(rgba(16, 16, 16, 0.65), rgba(16, 16, 16, 0.65)), url('https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
+        }
+
         .nav-link.active { background-color: var(--main-red); color: white; }
         .nav-link:not(.active) { color: var(--text-dark); hover:bg-gray-800; }
         .content-section { display: none; }
@@ -60,7 +84,8 @@
         .modal-container { position: relative; margin: auto; top: 50%; transform: translateY(-50%); width: 90%; max-width: 500px; padding: 20px; background: var(--card-bg-opaque); border-radius: 0.75rem; border: 1px solid #262626; text-align: center; }
     </style>
 </head>
-<body class="antialiased">
+<!-- Se añade la clase de fondo inicial para la sección "Resumen" -->
+<body class="antialiased bg-resumen">
     <!-- Modal para el escáner de código de barras -->
     <div id="barcode-scanner-modal" class="modal-overlay">
         <div class="modal-container">
@@ -127,8 +152,8 @@
                                 <div class="card text-center"><h4 class="text-md font-semibold text-gray-500">Grasas</h4><p id="gramos-grasas" class="text-3xl font-bold">63g</p></div>
                             </div>
                              <div class="card text-center">
-                                <button id="change-goal-ai-btn" class="btn-primary w-full">✨ Ajustar Objetivo con IA</button>
-                             </div>
+                                 <button id="change-goal-ai-btn" class="btn-primary w-full">✨ Ajustar Objetivo con IA</button>
+                               </div>
                         </div>
                     </div>
                 </section>
@@ -216,43 +241,57 @@
                 
                 <!-- SECCIÓN PROGRESO -->
                 <section id="progreso" class="content-section">
-                        <div class="text-center mb-10">
-                            <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Tu Centro de Progreso</h2>
-                            <p class="mt-4 text-lg text-gray-400">Registra tus métricas, notas y levantamientos. La data es poder.</p>
-                            <div class="mt-6">
-                                <button id="analyze-progress-btn" class="btn-primary text-lg py-3 px-6">✨ ¡Analiza Mi Progreso con IA!</button>
-                            </div>
+                    <div class="text-center mb-10">
+                        <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Tu Centro de Progreso</h2>
+                        <p class="mt-4 text-lg text-gray-400">Registra tus métricas, notas y levantamientos. La data es poder.</p>
+                        <div class="mt-6">
+                            <button id="analyze-progress-btn" class="btn-primary text-lg py-3 px-6">✨ ¡Analiza Mi Progreso con IA!</button>
                         </div>
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                <div class="card space-y-4"><h3 class="text-xl font-bold text-center text-red-500">Registro de Medidas</h3>
-                                    <form id="measurement-form" class="grid grid-cols-2 gap-4"><input type="date" id="measure-date" class="form-input col-span-2"><input type="number" step="0.1" id="measure-weight" placeholder="Peso (kg)" class="form-input"><input type="number" step="0.1" id="measure-waist" placeholder="Cintura (cm)" class="form-input"><input type="number" step="0.1" id="measure-chest" placeholder="Pecho (cm)" class="form-input"><input type="number" step="0.1" id="measure-arm" placeholder="Brazo (cm)" class="form-input"><button type="submit" class="btn-primary col-span-2">Guardar Medidas</button></form>
-                                    <div class="overflow-auto max-h-60"><table class="w-full text-sm text-left"><thead class="text-xs text-red-400 uppercase bg-black/30"><tr><th class="p-2">Fecha</th><th class="p-2">Peso</th><th class="p-2">Cintura</th><th class="p-2">Pecho</th><th class="p-2">Brazo</th><th class="p-2"></th></tr></thead><tbody id="measurements-history" class="divide-y divide-gray-800"></tbody></table></div>
-                                </div>
-                                <div class="card space-y-4"><h3 class="text-xl font-bold text-center text-red-500">Bitácora de Notas</h3>
-                                    <form id="notes-form" class="space-y-4"><textarea id="note-text" rows="4" class="form-textarea" placeholder="Anota tus victorias, sensaciones, ajustes..."></textarea><button type="submit" class="btn-primary w-full">Guardar Nota</button></form>
-                                    <div id="notes-history" class="space-y-3 overflow-auto max-h-60 pr-2"></div>
-                                </div>
-                                <div class="card lg:col-span-2 space-y-4"><h3 class="text-xl font-bold text-center text-red-500">Registro de Levantamientos</h3>
-                                    <form id="lift-form" class="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
-                                        <div class="sm:col-span-2"><label for="lift-exercise" class="text-xs text-gray-400">Ejercicio</label><select id="lift-exercise" class="form-input w-full"></select></div>
-                                        <div><label for="lift-weight" class="text-xs text-gray-400">Peso (kg)</label><input type="number" step="0.5" id="lift-weight" placeholder="kg" class="form-input w-full"></div>
-                                        <div><label for="lift-reps" class="text-xs text-gray-400">Reps</label><input type="number" id="lift-reps" placeholder="Reps" class="form-input w-full"></div>
-                                        <button type="submit" class="btn-primary sm:col-span-4 w-full">Guardar Levantamiento</button>
-                                    </form>
-                                    <div class="flex justify-between items-center"><h4 class="text-lg font-semibold">Historial</h4><select id="lift-filter" class="form-input w-1/2 sm:w-1/3"></select></div>
-                                    <div class="overflow-auto max-h-72"><table class="w-full text-sm text-left"><thead class="text-xs text-red-400 uppercase bg-black/30"><tr><th class="p-2">Fecha</th><th class="p-2">Ejercicio</th><th class="p-2">Peso</th><th class="p-2">Reps</th><th class="p-2"></th></tr></thead><tbody id="lifts-history" class="divide-y divide-gray-800"></tbody></table></div>
-                                </div>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="card space-y-4"><h3 class="text-xl font-bold text-center text-red-500">Registro de Medidas</h3>
+                            <form id="measurement-form" class="grid grid-cols-2 gap-4"><input type="date" id="measure-date" class="form-input col-span-2"><input type="number" step="0.1" id="measure-weight" placeholder="Peso (kg)" class="form-input"><input type="number" step="0.1" id="measure-waist" placeholder="Cintura (cm)" class="form-input"><input type="number" step="0.1" id="measure-chest" placeholder="Pecho (cm)" class="form-input"><input type="number" step="0.1" id="measure-arm" placeholder="Brazo (cm)" class="form-input"><button type="submit" class="btn-primary col-span-2">Guardar Medidas</button></form>
+                            <div class="overflow-auto max-h-60"><table class="w-full text-sm text-left"><thead class="text-xs text-red-400 uppercase bg-black/30"><tr><th class="p-2">Fecha</th><th class="p-2">Peso</th><th class="p-2">Cintura</th><th class="p-2">Pecho</th><th class="p-2">Brazo</th><th class="p-2"></th></tr></thead><tbody id="measurements-history" class="divide-y divide-gray-800"></tbody></table></div>
                         </div>
+                        <div class="card space-y-4"><h3 class="text-xl font-bold text-center text-red-500">Bitácora de Notas</h3>
+                            <form id="notes-form" class="space-y-4">
+                                <textarea id="note-text" rows="4" class="form-textarea" placeholder="Anota tus victorias, sensaciones, ajustes..."></textarea>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button type="submit" class="btn-primary w-full">Guardar Nota</button>
+                                    <button type="button" id="analyze-wellness-btn" class="btn-primary w-full">✨ Analizar Bienestar</button>
+                                </div>
+                            </form>
+                            <div id="notes-history" class="space-y-3 overflow-auto max-h-60 pr-2"></div>
+                        </div>
+                        <div class="card lg:col-span-2 space-y-4"><h3 class="text-xl font-bold text-center text-red-500">Registro de Levantamientos</h3>
+                            <form id="lift-form" class="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
+                                <div class="sm:col-span-2"><label for="lift-exercise" class="text-xs text-gray-400">Ejercicio</label><select id="lift-exercise" class="form-input w-full"></select></div>
+                                <div><label for="lift-weight" class="text-xs text-gray-400">Peso (kg)</label><input type="number" step="0.5" id="lift-weight" placeholder="kg" class="form-input w-full"></div>
+                                <div><label for="lift-reps" class="text-xs text-gray-400">Reps</label><input type="number" id="lift-reps" placeholder="Reps" class="form-input w-full"></div>
+                                <button type="submit" class="btn-primary sm:col-span-4 w-full">Guardar Levantamiento</button>
+                            </form>
+                            <div class="flex justify-between items-center"><h4 class="text-lg font-semibold">Historial</h4><select id="lift-filter" class="form-input w-1/2 sm:w-1/3"></select></div>
+                            <div class="overflow-auto max-h-72"><table class="w-full text-sm text-left"><thead class="text-xs text-red-400 uppercase bg-black/30"><tr><th class="p-2">Fecha</th><th class="p-2">Ejercicio</th><th class="p-2">Peso</th><th class="p-2">Reps</th><th class="p-2"></th></tr></thead><tbody id="lifts-history" class="divide-y divide-gray-800"></tbody></table></div>
+                        </div>
+                    </div>
                 </section>
                 
                 <!-- SECCIÓN RECURSOS -->
                 <section id="recursos" class="content-section">
                     <div class="text-center mb-10"><h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Caja de Herramientas</h2><p class="mt-4 text-lg text-gray-400">Conocimiento clave para potenciar tus resultados.</p></div>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <div class="card lg:col-span-3"><h3 class="text-2xl font-bold mb-4">Calculadoras de Entrenamiento</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="card md:col-span-2"><h3 class="text-2xl font-bold mb-4">Calculadoras de Entrenamiento</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div><h4 class="font-bold text-lg text-red-500 mb-2">Calculadora de 1RM Estimado</h4><form id="1rm-form" class="space-y-3"><input type="number" id="1rm-weight" placeholder="Peso levantado (kg)" class="form-input w-full"><input type="number" id="1rm-reps" placeholder="Repeticiones completadas" class="form-input w-full"><button type="submit" class="btn-primary w-full">Calcular 1RM</button></form><p id="1rm-result" class="mt-3 font-bold text-center text-xl"></p></div>
                             <div><h4 class="font-bold text-lg text-red-500 mb-2">Calculadora de Peso por RIR</h4><form id="rir-form" class="space-y-3"><input type="number" id="rir-1rm" placeholder="Tu 1RM estimado (kg)" class="form-input w-full"><input type="number" id="rir-reps" placeholder="Repeticiones objetivo" class="form-input w-full"><input type="number" id="rir-rir" placeholder="RIR deseado (0-3)" class="form-input w-full"><button type="submit" class="btn-primary w-full">Calcular Peso</button></form><p id="rir-result" class="mt-3 font-bold text-center text-xl"></p></div>
                         </div></div>
+                        <!-- NUEVA TARJETA: GENERADOR DE SUPLEMENTOS -->
+                        <div class="card lg:row-start-1 lg:col-start-3"><h3 class="text-2xl font-bold mb-4">✨ Stack de Suplementos</h3>
+                            <form id="supplement-form" class="space-y-3">
+                                <p class="text-sm text-gray-400">Describe tu objetivo principal (ej. ganar músculo, perder grasa) para recibir una sugerencia.</p>
+                                <input type="text" id="supplement-goal" placeholder="Mi objetivo es..." class="form-input w-full">
+                                <button type="submit" class="btn-primary w-full">Generar Sugerencia</button>
+                            </form>
+                        </div>
                         <div class="card"><h3 class="text-2xl font-bold mb-4">Fundamentales</h3><ul class="text-sm list-disc list-inside text-gray-300 space-y-2"><li><strong>Abdomen:</strong> Sobrecarga progresiva con Crunch en Polea y Elev. de Piernas Colgado.</li><li><strong>Antebrazo:</strong> Atacar con flexión/extensión de muñeca y trabajo de agarre.</li></ul></div>
                         <div class="card"><h3 class="text-2xl font-bold mb-4">Ciencia</h3><ul class="text-sm list-disc list-inside text-gray-300 space-y-2"><li><strong>Déficit Calórico:</strong> Esencial para la oxidación de grasa.</li><li><strong>Proteína Elevada:</strong> Clave para la retención muscular.</li><li><strong>Sobrecarga Progresiva:</strong> El pilar del progreso.</li></ul></div>
                         <div class="card"><h3 class="text-2xl font-bold mb-4">Mindset</h3><ul class="text-sm list-disc list-inside text-gray-300 space-y-2"><li><strong>Consistencia > Perfección.</strong></li><li><strong>Paciencia y objetividad.</strong></li><li><strong>Conexión Mente-Músculo.</strong></li></ul></div>
@@ -277,7 +316,11 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     // --- DATOS Y CONFIGURACIÓN INICIAL ---
-    let macroData = { calorias: 2270, proteina: 225, carbs: 200, grasas: 63 };
+    
+    // --> MODIFICACIÓN: Cargar datos de macros desde localStorage o usar valores por defecto.
+    const savedMacroData = localStorage.getItem('fitnessMacroDataDR');
+    let macroData = savedMacroData ? JSON.parse(savedMacroData) : { calorias: 2270, proteina: 225, carbs: 200, grasas: 63 };
+
     const workoutData = {
         '1':{ title:'Día 1: Empuje (Pecho, Hombro, Tríceps)', description:'Énfasis en fuerza e hipertrofia.', main_work: [ {name:'Press de Banca con Barra',sets:4,reps:'6-10',rest:'180s',rir:'2'}, {name:'Press Inclinado con Mancuernas',sets:3,reps:'8-12',rest:'120s',rir:'1-2'}, {name:'Press Militar con Barra',sets:4,reps:'6-10',rest:'150s',rir:'2'}, {name:'Elevaciones Laterales',sets:4,reps:'12-15',rest:'75s',rir:'1'}, {name:'Fondos en Paralelas (o Máquina)',sets:3,reps:'Al fallo',rest:'90s',rir:'0'}, {name:'Extensiones de Tríceps en Polea',sets:3,reps:'12-15',rest:'75s',rir:'Drop set'} ], specific_work: [ {name:'Crunch en Polea Alta',sets:3,reps:'15-20',rest:'60s',rir:'1'}, {name:'Elevaciones de Piernas Colgado',sets:3,reps:'15-20',rest:'60s',rir:'1'} ], cardio: { name: 'CARDIO LISS', details: '30-45 minutos a ritmo constante (65-75% FC Máx).' } },
         '2':{ title:'Día 2: Tirón (Espalda, Bíceps)', description:'Construcción de densidad y fuerza.', main_work: [ {name:'Peso Muerto Rumano (RDL)',sets:4,reps:'6-10',rest:'180s',rir:'2'}, {name:'Remo con Barra',sets:4,reps:'6-10',rest:'150s',rir:'2'}, {name:'Remo con Mancuerna',sets:3,reps:'8-12 c/b',rest:'90s',rir:'1-2'}, {name:'Face Pulls',sets:4,reps:'15-20',rest:'75s',rir:'1'}, {name:'Curl con Barra Z',sets:3,reps:'8-12',rest:'90s',rir:'1-2'} ], specific_work: [ {name:'Curl Martillo',sets:3,reps:'10-15',rest:'75s',rir:'1'}, {name:'Curl de Muñeca (Flex/Ext)',sets:'3 c/u',reps:'15-20',rest:'60s',rir:'1'} ] },
@@ -294,11 +337,20 @@ document.addEventListener('DOMContentLoaded', function () {
     const workoutNav = document.getElementById('workout-nav');
     const workoutContent = document.getElementById('workout-content');
     
-    // --- LÓGICA DE NAVEGACIÓN ---
+    // --- LÓGICA DE NAVEGACIÓN Y FONDO DINÁMICO ---
+    const backgroundClasses = ['bg-resumen', 'bg-fit-ai', 'bg-nutricion', 'bg-entrenamiento', 'bg-progreso', 'bg-recursos'];
+    
+    function updateBackground(tabId) {
+        document.body.classList.remove(...backgroundClasses);
+        document.body.classList.add(`bg-${tabId}`);
+    }
+
     navLinks.forEach(link => { 
         link.addEventListener('click', e => { 
             e.preventDefault(); 
             const tabId = e.currentTarget.dataset.tab; 
+            
+            updateBackground(tabId);
             contentSections.forEach(s => s.classList.remove('active')); 
             document.getElementById(tabId).classList.add('active'); 
             navLinks.forEach(l => {
@@ -395,7 +447,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function populateExerciseSelects() { liftFilterSelect.innerHTML = '<option value="all">Todos los Ejercicios</option>'; liftExerciseSelect.innerHTML = '<option value="">Selecciona Ejercicio</option>'; allExercises.forEach(ex => { liftExerciseSelect.innerHTML += `<option value="${ex}">${ex}</option>`; liftFilterSelect.innerHTML += `<option value="${ex}">${ex}</option>`; }); }
     function renderMeasurements() { measurements.sort((a,b)=>new Date(b.date)-new Date(a.date)); measureHistoryEl.innerHTML = measurements.map(m=>`<tr><td class="p-2">${new Date(m.date).toLocaleDateString('es-CO',{timeZone:'UTC'})}</td><td class="p-2">${m.weight||'N/A'} kg</td><td class="p-2">${m.waist||'N/A'} cm</td><td class="p-2">${m.chest||'N/A'} cm</td><td class="p-2">${m.arm||'N/A'} cm</td><td class="p-2 text-right"><button class="btn-danger delete-btn" data-type="measure" data-id="${m.id}">X</button></td></tr>`).join(''); }
-    function renderNotes() { notes.sort((a,b)=>b.id-a.id); notesHistoryEl.innerHTML = notes.map(n=>`<div class="bg-black/20 p-3 rounded-lg"><p class="text-sm text-gray-300 whitespace-pre-wrap">${n.text}</p><div class="text-xs text-gray-500 mt-2 flex justify-between items-center">${n.date} <button class="btn-danger delete-btn" data-type="note" data-id="${n.id}">X</button></div></div>`).join(''); }
+    function renderNotes() { 
+        notes.sort((a,b)=>b.id-a.id); 
+        notesHistoryEl.innerHTML = notes.map(n=>`<div class="bg-black/20 p-3 rounded-lg"><p class="text-sm text-gray-300 whitespace-pre-wrap">${n.text}</p><div class="text-xs text-gray-500 mt-2 flex justify-between items-center">${n.date} <button class="btn-danger delete-btn" data-type="note" data-id="${n.id}">X</button></div></div>`).join(''); 
+        // Habilitar o deshabilitar el botón de análisis de bienestar
+        document.getElementById('analyze-wellness-btn').disabled = notes.length === 0;
+    }
     function renderLifts() { lifts.sort((a, b) => new Date(b.date) - new Date(a.date)); const filter = liftFilterSelect.value; const filteredLifts = filter === 'all' ? lifts : lifts.filter(l => l.exercise === filter); liftHistoryEl.innerHTML = filteredLifts.map(l => `<tr><td class="p-2">${new Date(l.date).toLocaleDateString('es-CO', {timeZone:'UTC'})}</td><td class="p-2 font-semibold">${l.exercise}</td><td class="p-2">${l.weight} kg</td><td class="p-2">${l.reps}</td><td class="p-2 text-right"><button class="btn-danger delete-btn" data-type="lift" data-id="${l.id}">X</button></td></tr>`).join(''); }
     
     measureForm.addEventListener('submit', e=>{ e.preventDefault(); if(!e.target.elements['measure-date'].value) { showAlert('Selecciona una fecha.'); return;} measurements.push({id:Date.now(),date:e.target.elements['measure-date'].value,weight:e.target.elements['measure-weight'].value||'N/A',waist:e.target.elements['measure-waist'].value||'N/A',chest:e.target.elements['measure-chest'].value||'N/A',arm:e.target.elements['measure-arm'].value||'N/A'}); localStorage.setItem('fitnessMeasurementsDR', JSON.stringify(measurements)); renderMeasurements(); e.target.reset(); e.target.elements['measure-date'].valueAsDate = new Date(); });
@@ -565,7 +622,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('scan-barcode-btn').addEventListener('click', startScanner);
     document.getElementById('close-scanner-btn').addEventListener('click', stopScanner);
 
-    // --- NUEVA LÓGICA DE IA (OBJETIVOS Y ENTRENAMIENTO) ---
+    // --- LÓGICA DE IA (OBJETIVOS Y ENTRENAMIENTO) ---
     document.getElementById('change-goal-ai-btn').addEventListener('click', () => {
         const modalContent = `
             <p class="text-gray-400 mb-4">Describe tu nuevo objetivo físico. Por ejemplo: "Quiero ganar masa muscular y peso", "Busco perder 5 kilos y definir", o "Necesito más energía para mis entrenamientos".</p>
@@ -590,9 +647,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (result.error) throw new Error(result.error);
                 if (result.calorias && result.proteina && result.carbs && result.grasas) {
                     macroData = result;
+                    localStorage.setItem('fitnessMacroDataDR', JSON.stringify(macroData));
                     updateMacroDisplay();
                     hideAiModal();
-                    showAlert('¡Tus objetivos nutricionales han sido actualizados!');
+                    showAlert('¡Tus objetivos nutricionales han sido actualizados y guardados!');
                 } else {
                     throw new Error("La respuesta de la IA no tenía el formato esperado.");
                 }
@@ -638,6 +696,66 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+    // --- NUEVAS FUNCIONES DE IA ---
+
+    // Analizador de Bienestar
+    document.getElementById('analyze-wellness-btn').addEventListener('click', async () => {
+        if (notes.length === 0) {
+            showAlert('No hay notas para analizar. Escribe algunas notas primero.');
+            return;
+        }
+        showAiModalLoading("✨ Analizando tu Bienestar...");
+        const allNotesText = notes.map(n => n.text).join('\n---\n');
+        const prompt = `Eres un coach de bienestar y fitness. Analiza las siguientes notas de un usuario en busca de patrones sobre sueño, estrés, energía y motivación: "${allNotesText}". Basado en tu análisis, proporciona 2-3 consejos prácticos y accionables en español para ayudar al usuario a mejorar estas áreas y, como consecuencia, su rendimiento físico. Responde ÚNICAMENTE con un objeto JSON con una clave "wellness_tips", que es un array de strings, donde cada string es un consejo.`;
+        
+        try {
+            const result = await callGeminiAPI(prompt);
+            if (result.error) throw new Error(result.error);
+
+            let tipsHtml = result.wellness_tips.map(tip => `<div class="bg-black/20 p-4 rounded-lg mb-3 border border-gray-800"><p class="text-gray-300">${tip}</p></div>`).join('');
+            aiModalTitle.textContent = "Consejos de Bienestar";
+            aiModalContent.innerHTML = tipsHtml;
+            aiModalLoaderEl.style.display = 'none';
+        } catch (error) {
+            aiModalContent.innerHTML = `<p class="text-red-500 text-center">Hubo un error al analizar tus notas: ${error.message}</p>`;
+            aiModalLoaderEl.style.display = 'none';
+        }
+    });
+
+    // Generador de Stack de Suplementos
+    document.getElementById('supplement-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const goal = document.getElementById('supplement-goal').value.trim();
+        if (!goal) {
+            showAlert('Por favor, describe tu objetivo para la suplementación.');
+            return;
+        }
+
+        showAiModalLoading("✨ Generando Sugerencia de Suplementos...");
+        const prompt = `Eres un asistente de IA con conocimientos sobre suplementación deportiva. Un usuario tiene el objetivo de "${goal}". Sugiere un stack básico y seguro de 2-3 suplementos comunes. Para cada uno, proporciona su nombre, el principal beneficio relacionado con el objetivo del usuario y una recomendación de uso común (dosis y timing). IMPORTANTE: Incluye un descargo de responsabilidad claro. Responde ÚNICAMENTE como un objeto JSON con dos claves: "disclaimer" (string con el descargo de responsabilidad) y "supplement_stack" (un array de objetos, donde cada objeto tiene las claves "name", "benefit" y "usage").`;
+
+        try {
+            const result = await callGeminiAPI(prompt);
+            if (result.error) throw new Error(result.error);
+
+            let stackHtml = `<div class="p-4 mb-4 rounded-lg bg-yellow-900/50 border border-yellow-400"><p class="font-bold text-yellow-300">IMPORTANTE:</p><p class="text-sm text-yellow-300">${result.disclaimer}</p></div>`;
+            stackHtml += result.supplement_stack.map(sup => `
+                <div class="bg-black/20 p-4 rounded-lg mb-3 border border-gray-800">
+                    <h4 class="font-bold text-red-400 text-lg">${sup.name}</h4>
+                    <p class="text-gray-300 mt-2"><strong class="font-semibold text-white">Beneficio:</strong> ${sup.benefit}</p>
+                    <p class="text-gray-300 mt-1"><strong class="font-semibold text-white">Uso sugerido:</strong> ${sup.usage}</p>
+                </div>
+            `).join('');
+
+            aiModalTitle.textContent = "Sugerencia de Suplementos";
+            aiModalContent.innerHTML = stackHtml;
+            aiModalLoaderEl.style.display = 'none';
+        } catch (error) {
+            aiModalContent.innerHTML = `<p class="text-red-500 text-center">Hubo un error al generar la sugerencia: ${error.message}</p>`;
+            aiModalLoaderEl.style.display = 'none';
+        }
+    });
     
     // --- CARGA INICIAL DE LA APLICACIÓN ---
     document.getElementById('measure-date').valueAsDate = new Date();
@@ -648,7 +766,7 @@ document.addEventListener('DOMContentLoaded', function () {
     renderWorkout('1');
     checkDateAndResetLog();
     renderDailyLog();
-    renderMacroChart();
+    updateMacroDisplay(); 
 });
 </script>
 </body>
